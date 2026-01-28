@@ -68,4 +68,4 @@ TBD
 
 ## Contact
 
-Built by an electrician, for electricians.
+Built for electricians.
