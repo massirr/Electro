@@ -1,0 +1,114 @@
+{
+    "kits": [
+        {
+            "takeoff_id": "recessed-6in",
+            "takeoff_name": "Recessed light 6\"",
+            "components": [
+                {
+                    "sku": "REC-600-WH",
+                    "quantity_per_unit": 1
+                },
+                {
+                    "sku": "BOX-4SQ",
+                    "quantity_per_unit": 1
+                },
+                {
+                    "sku": "CON-WM-WH",
+                    "quantity_per_unit": 3
+                }
+            ]
+        },
+        {
+            "takeoff_id": "outlet-duplex",
+            "takeoff_name": "Duplex outlet",
+            "components": [
+                {
+                    "sku": "OUT-DUP-WH",
+                    "quantity_per_unit": 1
+                },
+                {
+                    "sku": "BOX-1G",
+                    "quantity_per_unit": 1
+                },
+                {
+                    "sku": "CON-WM-WH",
+                    "quantity_per_unit": 2
+                }
+            ]
+        },
+        {
+            "takeoff_id": "switch-single",
+            "takeoff_name": "Single pole switch",
+            "components": [
+                {
+                    "sku": "SW-SP-WH",
+                    "quantity_per_unit": 1
+                },
+                {
+                    "sku": "BOX-1G",
+                    "quantity_per_unit": 1
+                },
+                {
+                    "sku": "CON-WM-WH",
+                    "quantity_per_unit": 2
+                }
+            ]
+        },
+        {
+            "takeoff_id": "switch-3way",
+            "takeoff_name": "3-way switch",
+            "components": [
+                {
+                    "sku": "SW-3W-WH",
+                    "quantity_per_unit": 1
+                },
+                {
+                    "sku": "BOX-1G",
+                    "quantity_per_unit": 1
+                },
+                {
+                    "sku": "CON-WM-WH",
+                    "quantity_per_unit": 3
+                }
+            ]
+        },
+        {
+            "takeoff_id": "panel-200a",
+            "takeoff_name": "200A main panel",
+            "components": [
+                {
+                    "sku": "PNL-200A-MB",
+                    "quantity_per_unit": 1
+                },
+                {
+                    "sku": "BRK-20A-SP",
+                    "quantity_per_unit": 4
+                },
+                {
+                    "sku": "BRK-15A-SP",
+                    "quantity_per_unit": 8
+                }
+            ]
+        },
+        {
+            "takeoff_id": "wire-12-2",
+            "takeoff_name": "12/2 NMD wire (meters)",
+            "components": [
+                {
+                    "sku": "WIR-12-2-NMD",
+                    "quantity_per_unit": 1
+                }
+            ]
+        },
+        {
+            "takeoff_id": "wire-14-2",
+            "takeoff_name": "14/2 NMD wire (meters)",
+            "components": [
+                {
+                    "sku": "WIR-14-2-NMD",
+                    "quantity_per_unit": 1
+                }
+            ]
+        }
+    ]
+}

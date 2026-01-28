@@ -1,0 +1,53 @@
+{
+    "project": "Residential Apartment - Unit 4B",
+    "date": "2026-01-28",
+    "items": [
+        {
+            "id": "recessed-6in",
+            "name": "Recessed light 6\"",
+            "quantity": 12,
+            "hours_per_unit": 0.5
+        },
+        {
+            "id": "outlet-duplex",
+            "name": "Duplex outlet",
+            "quantity": 18,
+            "hours_per_unit": 0.25
+        },
+        {
+            "id": "switch-single",
+            "name": "Single pole switch",
+            "quantity": 8,
+            "hours_per_unit": 0.25
+        },
+        {
+            "id": "switch-3way",
+            "name": "3-way switch",
+            "quantity": 4,
+            "hours_per_unit": 0.35
+        },
+        {
+            "id": "panel-200a",
+            "name": "200A main panel",
+            "quantity": 1,
+            "hours_per_unit": 4.0
+        },
+        {
+            "id": "wire-12-2",
+            "name": "12/2 NMD wire (meters)",
+            "quantity": 150,
+            "hours_per_unit": 0.02
+        },
+        {
+            "id": "wire-14-2",
+            "name": "14/2 NMD wire (meters)",
+            "quantity": 200,
+            "hours_per_unit": 0.02
+        }
+    ],
+    "settings": {
+        "hourly_rate": 85,
+        "vat_percent": 21,
+        "margin_percent": 15
+    }
+}
