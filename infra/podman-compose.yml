@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: docker.io/library/postgres:16-alpine
+    container_name: electro-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: electro
+      POSTGRES_USER: electro
+      POSTGRES_PASSWORD: electro_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - electro-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  electro-postgres-data:
