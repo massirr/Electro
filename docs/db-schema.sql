@@ -1,3 +1,0 @@
--- Deprecated: this file describes the old PostgreSQL-first plan.
--- Active schema planning now lives in docs/pocketbase-schema.md.
--- Keep this file only as a historical reference until the repo is cleaned up.
