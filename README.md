@@ -19,7 +19,7 @@ Planning scaffold complete. Sample data exists, implementation not started.
 
 - Agent workflow: [AGENTS.md](AGENTS.md)
 - Next work queue: [docs/PHASE_01_PLAN.md](docs/PHASE_01_PLAN.md)
-- Initial DB schema: [docs/db-schema.sql](docs/db-schema.sql)
+- PocketBase collection plan: [docs/pocketbase-schema.md](docs/pocketbase-schema.md)
 
 ---
 
@@ -33,7 +33,7 @@ Planning scaffold complete. Sample data exists, implementation not started.
 │   └── sample-inputs/
 ├── docs/
 │   ├── PHASE_01_PLAN.md
-│   ├── db-schema.sql
+│   ├── pocketbase-schema.md
 │   └── design/
 │       └── Hugues.excalidraw
 ├── infra/
@@ -57,6 +57,13 @@ src/
 ```
 
 Detailed implementation order is in `docs/PHASE_01_PLAN.md`.
+
+## Backend Direction
+
+- Backend runtime: `PocketBase`
+- Auth for MVP: `PocketBase auth`
+- Persistence: PocketBase embedded `SQLite`
+- App server/UI: `Next.js` App Router
 
 ---
 

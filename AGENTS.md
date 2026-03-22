@@ -16,9 +16,9 @@ Questions should be used mainly to improve understanding before implementation.
 
 - Next.js (App Router) + TypeScript
 - Tailwind CSS + shadcn/ui
-- PostgreSQL
-- Podman for local DB runtime
-- Prisma (default ORM unless changed)
+- PocketBase
+- SQLite via PocketBase embedded database
+- PocketBase auth for MVP
 - Minimal GSAP during UI phase only (`@gsap/react`)
 
 ## Source of Truth
@@ -29,14 +29,14 @@ Questions should be used mainly to improve understanding before implementation.
 ## Start-of-Session Checklist
 
 1. `git pull origin main`
-2. `podman compose -f infra/podman-compose.yml up -d`
-3. Confirm PostgreSQL connection to `electro` DB.
+2. Start PocketBase locally.
+3. Confirm PocketBase is reachable and the target collections exist.
 4. Define one micro-step only.
 
 ## Build Order (Backend First)
 
 1. Minimal backend scaffold and test setup
-2. DB migrations from `docs/db-schema.sql`
+2. PocketBase collections from `docs/pocketbase-schema.md`
 3. Seed from `data/sample-inputs/*`
 4. Quote calculation logic
 5. Backend API routes/services

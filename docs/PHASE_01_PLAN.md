@@ -9,10 +9,10 @@ Use this alongside the learning workflow in `docs/LEARNING-PROCESS.md`.
 - Web app framework: `Next.js` (App Router) + TypeScript
 - Styling/UI: `Tailwind CSS` + `shadcn/ui`
 - UI motion: minimal `GSAP` (`@gsap/react`) during UI phase only
-- Auth: `NextAuth.js` (Auth.js)
-- Database: `PostgreSQL` (not MongoDB)
-- Local DB runtime: `Podman` (open-source, self-hosted friendly)
-- ORM/query layer: `Prisma` (default choice for speed)
+- Auth: `PocketBase auth` for the MVP
+- Backend data store: `PocketBase` with embedded `SQLite`
+- Schema model: PocketBase collections in `docs/pocketbase-schema.md`
+- ORM/query layer: not needed for the MVP while PocketBase is the backend
 
 ## Stage 1: Takeoff to Quote (do this now)
 
@@ -29,6 +29,7 @@ Use this alongside the learning workflow in `docs/LEARNING-PROCESS.md`.
   - API response payload
   - `quote.csv` export
 - Add tests for calculation/API correctness using sample data.
+- Keep quote calculation in server-side TypeScript code, not PocketBase hooks, for the first pass.
 
 ## Stage 2: Product Mapping
 
@@ -76,23 +77,36 @@ tests/
 
 Then implement `src/index.ts` to run the quote pipeline against `data/sample-inputs/*`.
 
-## Database First Milestone (before UI)
+## PocketBase First Milestone (before UI)
 
-1. Bring up PostgreSQL via Podman.
-2. Create schema/migrations from `docs/db-schema.sql`.
-3. Seed database from the sample input files.
-4. Validate these outputs in SQL:
+1. Start PocketBase locally.
+2. Create collections from `docs/pocketbase-schema.md`.
+3. Seed PocketBase from the sample input files.
+4. Validate these outputs through API queries or backend tests:
    - quote labor/material totals
    - required SKU quantities
    - supplier split draft
+5. Add auth-protected access to project data using PocketBase auth.
 
 ## Quick Explanation: "CLI + DB"
 
 - `CLI` means a terminal command you run locally (for example: `npm run quote:sample`).
-- `DB` means your PostgreSQL database.
+- `DB` means your PocketBase-backed data store.
 - `CLI + DB first` means:
   - build and test all core backend logic with terminal commands and database tests,
   - then add UI pages after backend behavior is stable.
+
+## Recommended Auth Choice
+
+Use PocketBase auth now.
+
+Reasoning:
+
+- it is the shortest path to a working MVP
+- it keeps auth and data in one backend
+- it avoids adding Auth.js session plumbing before there is a real need
+
+Revisit Auth.js only if future requirements demand a separate auth layer.
 
 ## Learning Control Rule
 
