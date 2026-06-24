@@ -8,5 +8,6 @@ export async function authenticateAdmin(
   email = process.env.PB_ADMIN_EMAIL ?? "admin@electro.local",
   password = process.env.PB_ADMIN_PASSWORD ?? "electro-dev-2026"
 ): Promise<void> {
-  await pb.admins.authWithPassword(email, password);
+  // PocketBase v0.22+ uses _superusers collection instead of pb.admins
+  await pb.collection("_superusers").authWithPassword(email, password);
 }
