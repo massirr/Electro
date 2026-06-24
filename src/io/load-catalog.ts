@@ -1,7 +1,8 @@
+import { readFile } from "node:fs/promises";
 import type { Product } from "../domain/types";
 
 export async function loadCatalog(filePath: string): Promise<Map<string, Product>> {
-  const text = await Bun.file(filePath).text();
+  const text = await readFile(filePath, "utf-8");
   const lines = text.trim().split("\n");
   const catalog = new Map<string, Product>();
 

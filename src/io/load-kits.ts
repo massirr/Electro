@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import type { Kit } from "../domain/types";
 
 interface KitsJSON {
@@ -12,7 +13,7 @@ interface KitsJSON {
 }
 
 export async function loadKits(filePath: string): Promise<Kit[]> {
-  const text = await Bun.file(filePath).text();
+  const text = await readFile(filePath, "utf-8");
   const raw: KitsJSON = JSON.parse(text);
 
   return raw.kits.map((k) => ({

@@ -3,5 +3,13 @@
 :root {
   --background: #0F0F0F;
   --foreground: #F9FAFB;
+  --surface: #1A1A1A;
+  --border: #2A2A2A;
   --accent: #5E6AD2;
+  --muted: #6B7280;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
 }

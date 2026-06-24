@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import type { TakeoffItem, QuoteSettings } from "../domain/types";
 
 interface TakeoffJSON {
@@ -24,7 +25,7 @@ export interface TakeoffData {
 }
 
 export async function loadTakeoff(filePath: string): Promise<TakeoffData> {
-  const text = await Bun.file(filePath).text();
+  const text = await readFile(filePath, "utf-8");
   const raw: TakeoffJSON = JSON.parse(text);
 
   const items: TakeoffItem[] = raw.items.map((i) => ({
