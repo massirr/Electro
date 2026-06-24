@@ -21,11 +21,6 @@ function blankRow(key: string): FormRow {
   return { key, id: "", name: "", quantity: 0, hoursPerUnit: 0, isDefault: false };
 }
 
-let _nextKey = 1;
-function nextKey() {
-  return String(_nextKey++);
-}
-
 const LS_KEY = "electro-takeoff-rows";
 
 // ─── ItemCombobox ──────────────────────────────────────────────────────────────
@@ -160,7 +155,9 @@ function ItemCombobox({
 export function TakeoffForm() {
   const [catalog, setCatalog] = useState<CatalogItem[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(true);
-  const [rows, setRows] = useState<FormRow[]>([blankRow(nextKey())]);
+  const nextKeyRef = useRef(2);
+  function nextKey() { return String(nextKeyRef.current++); }
+  const [rows, setRows] = useState<FormRow[]>(() => [blankRow("1")]);
 
   const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
   function qtyRefFor(key: string): React.RefObject<HTMLInputElement | null> {
