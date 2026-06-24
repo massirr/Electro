@@ -66,7 +66,7 @@ Every feature follows this order. No skipping steps.
 | `/plan-eng-review` | After design doc approved — lock architecture |
 | `/plan-ceo-review` | When scope feels too big or too small |
 | `/review` | Before committing — find bugs in the diff |
-| `/qa` | After implementing — drive a real browser, verify the feature works |
+| `/qa` | After implementing — drive a real browser via **Playwright MCP** |
 | `/ship` | Ready to merge — tests + PR |
 | `/investigate` | Something is broken and you don't know why |
 | `/cso` | Security audit (OWASP + STRIDE) |
@@ -131,6 +131,24 @@ UI follows `DESIGN.md` (Linear style):
 - Accent: `#5E6AD2` (purple)
 - Font: Inter
 - Tight spacing, no animations at prototype stage
+
+---
+
+## Browser testing — Playwright MCP
+
+Local QA uses **Playwright MCP** (already wired in Claude Code settings):
+
+```
+mcp__plugin_playwright_playwright__browser_navigate
+mcp__plugin_playwright_playwright__browser_snapshot
+mcp__plugin_playwright_playwright__browser_click
+mcp__plugin_playwright_playwright__browser_press_key
+mcp__plugin_playwright_playwright__browser_take_screenshot
+```
+
+Run `/qa` to drive a real browser session from Claude Code. No chromium install needed — MCP manages its own browser.
+
+`playwright.config.ts` + `e2e/` exist for CI only. Locally, use MCP.
 
 ---
 

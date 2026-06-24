@@ -44,3 +44,15 @@ infra/pocketbase/pocketbase
 
 # Bun
 bun.lockb
+.gstack/
+
+# Playwright — CI artifacts and MCP session files (don't commit)
+test-results/
+playwright-report/
+.playwright-mcp/
+
+# QA screenshots captured during testing sessions
+qa-*.png
+
+# TypeScript incremental build info
+tsconfig.tsbuildinfo

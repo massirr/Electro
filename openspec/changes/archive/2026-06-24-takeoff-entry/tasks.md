@@ -55,11 +55,11 @@
 
 ## Verification
 
-- [ ] V1 `bun test` — 28/28 pass (no regressions)
-- [ ] V2 `bun dev` — page loads, form functional
-- [ ] V3 Add 7 items keyboard-only in under 60 seconds
-- [ ] V4 Quote panel updates within 300ms of any input change
-- [ ] V5 Refresh page → rows restored from localStorage
-- [ ] V6 GET /api/catalog returns 7 entries with correct id/name/defaultHu
-- [ ] V7 Grand total matches expected: $5,088.58 for sample takeoff
-- [ ] V8 Playwright E2E — all 5 tests pass
+- [x] V1 `bun test` — 33/33 pass (28 original + 5 new catalog tests)
+- [x] V2 `bun dev` — page loads, form functional
+- [x] V3 Add 7 items keyboard-only in under 60 seconds
+- [x] V4 Quote panel updates within 300ms of any input change
+- [x] V5 Refresh page → rows restored from localStorage
+- [x] V6 GET /api/catalog returns 7 entries with correct id/name/defaultHu
+- [x] V7 Grand total matches expected: $5,088.58 for sample takeoff
+- [ ] V8 Playwright E2E — deferred (needs `playwright install chromium`; tests written in e2e/)
