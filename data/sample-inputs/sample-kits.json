@@ -3,6 +3,7 @@
         {
             "takeoff_id": "recessed-6in",
             "takeoff_name": "Recessed light 6\"",
+            "default_hours_per_unit": 0.5,
             "components": [
                 {
                     "sku": "REC-600-WH",
@@ -21,6 +22,7 @@
         {
             "takeoff_id": "outlet-duplex",
             "takeoff_name": "Duplex outlet",
+            "default_hours_per_unit": 0.25,
             "components": [
                 {
                     "sku": "OUT-DUP-WH",
@@ -39,6 +41,7 @@
         {
             "takeoff_id": "switch-single",
             "takeoff_name": "Single pole switch",
+            "default_hours_per_unit": 0.25,
             "components": [
                 {
                     "sku": "SW-SP-WH",
@@ -57,6 +60,7 @@
         {
             "takeoff_id": "switch-3way",
             "takeoff_name": "3-way switch",
+            "default_hours_per_unit": 0.35,
             "components": [
                 {
                     "sku": "SW-3W-WH",
@@ -75,6 +79,7 @@
         {
             "takeoff_id": "panel-200a",
             "takeoff_name": "200A main panel",
+            "default_hours_per_unit": 4.0,
             "components": [
                 {
                     "sku": "PNL-200A-MB",
@@ -93,6 +98,7 @@
         {
             "takeoff_id": "wire-12-2",
             "takeoff_name": "12/2 NMD wire (meters)",
+            "default_hours_per_unit": 0.02,
             "components": [
                 {
                     "sku": "WIR-12-2-NMD",
@@ -103,6 +109,7 @@
         {
             "takeoff_id": "wire-14-2",
             "takeoff_name": "14/2 NMD wire (meters)",
+            "default_hours_per_unit": 0.02,
             "components": [
                 {
                     "sku": "WIR-14-2-NMD",

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(openspec status *)",
+      "Bash(openspec instructions *)",
+      "Bash(openspec change *)",
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "mcp__plugin_microsoft-docs_microsoft-learn__microsoft_docs_search",
+      "mcp__plugin_microsoft-docs_microsoft-learn__microsoft_docs_fetch",
+      "mcp__filesystem__list_directory",
+      "mcp__filesystem__directory_tree"
+    ]
+  }
+}

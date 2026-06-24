@@ -7,6 +7,20 @@ import { loadKits } from "../../../io/load-kits";
 
 const DATA = resolve(process.cwd(), "data/sample-inputs");
 
+let _cache: Promise<[Awaited<ReturnType<typeof loadCatalog>>, Awaited<ReturnType<typeof loadKits>>]> | null = null;
+function getDataCache() {
+  if (!_cache) {
+    _cache = Promise.all([
+      loadCatalog(`${DATA}/sample-catalog.csv`),
+      loadKits(`${DATA}/sample-kits.json`),
+    ]).catch((e) => {
+      _cache = null; // allow retry on next request
+      throw e;
+    });
+  }
+  return _cache;
+}
+
 export async function POST(req: NextRequest) {
   let body: { takeoff?: TakeoffItem[]; settings?: QuoteSettings };
   try {
@@ -31,10 +45,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const [catalog, kits] = await Promise.all([
-    loadCatalog(`${DATA}/sample-catalog.csv`),
-    loadKits(`${DATA}/sample-kits.json`),
-  ]);
+  const [catalog, kits] = await getDataCache();
 
   const quote = buildQuote(takeoff, kits, catalog, settings);
   return NextResponse.json(quote);
