@@ -1,104 +1,59 @@
-# AGENTS Instructions (Electro)
+# Electro — Agent Instructions
 
-## Goal
+## Which tool to use for what
 
-Build Electro by learning in micro-steps with a backend-first approach.
-Questions should be used mainly to improve understanding before implementation.
+| Task | Tool |
+|------|------|
+| Planning, reviewing docs, editing files, quick questions | **Cowork** (Claude desktop) |
+| Running gstack skills (`/office-hours`, `/plan-eng-review`, `/review`, `/ship`) | **Claude Code** (`claude` in terminal) |
+| Running OpenSpec (`/opsx:propose`, `/opsx:apply`, `/opsx:archive`) | **Claude Code** |
+| Scaffold build, test runs, git commits, PRs | **Claude Code** |
+| Checking progress, reading plans, context catch-up | **Cowork** |
 
-## Current Scope
+**Rule:** If you are writing or running code, use Claude Code. If you are planning or reviewing, Cowork is fine.
 
-- Solo developer workflow
-- Dev environment only
-- Stage 1 first (Takeoff -> Quote), then Stage 2/3
-- UI comes after backend stability
+---
 
-## Locked Stack
+## Project
+Electro is a tool for electricians: Takeoff → Quote → Supplier Orders.
 
-- Next.js (App Router) + TypeScript
-- Tailwind CSS + shadcn/ui
-- PocketBase
-- SQLite via PocketBase embedded database
-- PocketBase auth for MVP
-- Minimal GSAP during UI phase only (`@gsap/react`)
+## Stack
+- Bun v1+ (runtime + package manager)
+- Next.js 15 (App Router) + TypeScript 5
+- Tailwind CSS 4 + shadcn/ui
+- PocketBase v0.22+ (single binary, SQLite, built-in auth)
+- Vitest (tests)
 
-## Source of Truth
+## Workflow
+1. /office-hours — challenge the requirement before writing a line
+2. /plan-eng-review — lock architecture, data flow, edge cases
+3. Implement (one micro-step at a time)
+4. /review — find bugs before they reach main
+5. /ship — tests, coverage, PR
 
-- GitHub repository is the source of truth.
-- Commit in small logical units after each validated step.
+For each OpenSpec change: propose → eng-review → apply → review → ship → archive
 
-## Start-of-Session Checklist
+## Key Paths
+- Domain logic: src/domain/
+- I/O layer: src/io/
+- API routes: src/app/api/
+- Tests: tests/
+- Sample data: data/sample-inputs/
+- PocketBase binary: infra/pocketbase/pocketbase
+- PocketBase migrations: infra/pocketbase/pb_migrations/
 
-1. `git pull origin main`
-2. Start PocketBase locally.
-3. Confirm PocketBase is reachable and the target collections exist.
-4. Define one micro-step only.
+## Running
+- Dev server: bun dev
+- Tests: bun test
+- CLI pipeline: bun run src/index.ts
+- PocketBase: ./infra/pocketbase/pocketbase serve
+- Seed: bun run scripts/seed-pocketbase.ts
 
-## Build Order (Backend First)
-
-1. Minimal backend scaffold and test setup
-2. PocketBase collections from `docs/pocketbase-schema.md`
-3. Seed from `data/sample-inputs/*`
-4. Quote calculation logic
-5. Backend API routes/services
-6. Backend tests (unit + integration)
-7. UI wiring after backend quality gates pass
-
-## Minimal Quality Gates
-
-- Calculation unit tests pass
-- Seed process passes
-- End-to-end quote generation passes on sample data
-- CSV export validated
-- API integration tests pass before UI work
-
-## Learning Mode Rules
-
-1. One micro-step at a time
-2. Prototype first, then tests to lock behavior
-3. Validate local tests first, then DB/runtime checks
-4. After each step, summarize in 3 lines:
-   - what was tested
-   - result
-   - next single step
-5. If confused, restate the current step in one sentence
-6. If environment breaks, fix environment first
-
-## Question-First Policy
-
-Use questions mainly for understanding, not to delay progress.
-
-- Ask concise questions when requirements are unclear.
-- Prefer one focused question at a time.
-- Confirm assumptions before changing architecture or data model.
-- Do not ask for information that can be discovered from project files.
-
-## Micro-Step Approval Gate (Required)
-
-Before coding, provide this checklist and wait for approval:
-
-1. File(s) to edit
-2. Why this step matters in architecture
-3. Expected input
-4. Expected output
-5. Verification command(s) and expected pass result
-6. What is out of scope for this step
-
-Only implement after approval.
-
-## UI + GSAP Rules (When UI Starts)
-
-- Keep animations minimal and purposeful.
-- Allowed examples:
-  - initial section reveal
-  - subtle CTA emphasis
-  - one quote preview transition
-- Use `@gsap/react` with `useGSAP`, scoped selectors, and cleanup.
-- Respect reduced-motion preferences.
-
-## Session Template (60-90 Minutes)
-
-1. Plan one micro-step (10 min)
-2. Implement one backend slice (25 min)
-3. Test and fix (20 min)
-4. Verify DB/runtime behavior (15 min)
-5. Commit + short retrospective (10 min)
+## Quality Gates
+| Gate | Command | Expected |
+|------|---------|----------|
+| Unit tests | bun test | 0 failures |
+| CLI pipeline | bun run src/index.ts | Correct quote numbers |
+| API route | bun test tests/api/ | 200 response, correct JSON |
+| Dev server | bun dev | No errors, page loads |
+| PocketBase | ./pocketbase serve | Starts, seed data present |

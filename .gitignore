@@ -32,3 +32,15 @@ logs/
 # Environment
 .env
 .env.local
+
+# Next.js
+.next/
+out/
+
+# PocketBase — pb_data contains the SQLite DB + admin credentials, NEVER commit
+infra/pocketbase/pb_data/
+# PocketBase binary is large — already gitignored, re-download via preflight-check.sh
+infra/pocketbase/pocketbase
+
+# Bun
+bun.lockb
