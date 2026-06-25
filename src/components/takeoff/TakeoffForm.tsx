@@ -104,7 +104,7 @@ function ItemCombobox({
           if (e.key === "Escape") closeDropdown();
         }}
       >
-        <span className={selected ? "text-[var(--ink)]" : "text-[var(--ink-subtle)]"}>
+        <span className={`block truncate ${selected ? "text-[var(--ink)]" : "text-[var(--ink-subtle)]"}`}>
           {disabled ? "Loading…" : selected ? selected.name : "Search items…"}
         </span>
       </button>
@@ -251,7 +251,7 @@ export function TakeoffForm() {
   // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-6">
       {/* Left: Takeoff table */}
       <section
         className="rounded-lg p-6"
@@ -264,8 +264,8 @@ export function TakeoffForm() {
           <thead>
             <tr className="border-b border-[var(--border)]">
               <th className="py-2 text-left font-medium text-[var(--ink-muted)]">Item</th>
-              <th className="py-2 text-right font-medium text-[var(--ink-muted)] w-20">Qty</th>
-              <th className="py-2 text-right font-medium text-[var(--ink-muted)] w-20">h/u</th>
+              <th className="py-2 text-right font-medium text-[var(--ink-muted)] w-16">Qty</th>
+              <th className="py-2 text-right font-medium text-[var(--ink-muted)] w-16">h/u</th>
               <th className="w-8" />
             </tr>
           </thead>
@@ -286,7 +286,7 @@ export function TakeoffForm() {
                       nextRef={qtyRefFor(row.key)}
                     />
                   </td>
-                  <td className="py-1.5 px-1 w-20">
+                  <td className="py-1.5 px-1 w-16">
                     <input
                       id={qtyInputId}
                       ref={(el) => {
@@ -304,7 +304,7 @@ export function TakeoffForm() {
                       className="w-full text-right text-sm px-2 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 focus:border-[var(--hairline-strong)] transition-colors disabled:opacity-50 [appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden tabular-nums"
                     />
                   </td>
-                  <td className="py-1.5 px-1 w-20">
+                  <td className="py-1.5 px-1 w-16">
                     <input
                       id={huInputId}
                       ref={(el) => {
