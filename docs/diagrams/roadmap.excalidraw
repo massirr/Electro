@@ -1,0 +1,45 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {"type":"text","id":"title","x":410,"y":12,"width":380,"height":32,"text":"Electro — Feature Roadmap","fontSize":26,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"textAlign":"left","verticalAlign":"top"},
+
+    {"type":"rectangle","id":"col1_bg","x":20,"y":55,"width":360,"height":790,"backgroundColor":"#d3f9d8","fillStyle":"solid","strokeColor":"#22c55e","strokeWidth":2,"opacity":40,"roughness":1,"roundness":{"type":3}},
+    {"type":"text","id":"col1_h","x":82,"y":68,"width":220,"height":26,"text":"PHASE 1 — DONE","fontSize":20,"strokeColor":"#15803d","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"textAlign":"left","verticalAlign":"top"},
+
+    {"type":"rectangle","id":"col2_bg","x":420,"y":55,"width":360,"height":790,"backgroundColor":"#dbe4ff","fillStyle":"solid","strokeColor":"#4a9eed","strokeWidth":2,"opacity":40,"roughness":1,"roundness":{"type":3}},
+    {"type":"text","id":"col2_h","x":480,"y":68,"width":240,"height":26,"text":"PHASE 2 — NEXT","fontSize":20,"strokeColor":"#1d4ed8","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"textAlign":"left","verticalAlign":"top"},
+
+    {"type":"rectangle","id":"col3_bg","x":820,"y":55,"width":370,"height":790,"backgroundColor":"#e5dbff","fillStyle":"solid","strokeColor":"#8b5cf6","strokeWidth":2,"opacity":40,"roughness":1,"roundness":{"type":3}},
+    {"type":"text","id":"col3_h","x":855,"y":68,"width":280,"height":26,"text":"PHASE 3 — FUTURE","fontSize":20,"strokeColor":"#6d28d9","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"textAlign":"left","verticalAlign":"top"},
+
+    {"type":"rectangle","id":"p1a","x":40,"y":115,"width":320,"height":58,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Domain types + calculators","fontSize":17}},
+    {"type":"rectangle","id":"p1b","x":40,"y":188,"width":320,"height":58,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"I/O layer (CSV + JSON loaders)","fontSize":17}},
+    {"type":"rectangle","id":"p1c","x":40,"y":261,"width":320,"height":58,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"POST /api/quote route","fontSize":17}},
+    {"type":"rectangle","id":"p1d","x":40,"y":334,"width":320,"height":58,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Takeoff entry form (live combobox)","fontSize":17}},
+    {"type":"rectangle","id":"p1e","x":40,"y":407,"width":320,"height":58,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Live quote preview (real-time calc)","fontSize":17}},
+    {"type":"rectangle","id":"p1f","x":40,"y":480,"width":320,"height":58,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Dark / Light theme toggle","fontSize":17}},
+    {"type":"rectangle","id":"p1g","x":40,"y":553,"width":320,"height":58,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Vercel deploy + GitHub CI","fontSize":17}},
+
+    {"type":"rectangle","id":"p2a","x":440,"y":115,"width":320,"height":58,"backgroundColor":"#a5d8ff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#2563eb","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Auth — PocketBase email/password","fontSize":17}},
+    {"type":"rectangle","id":"p2b","x":440,"y":188,"width":320,"height":58,"backgroundColor":"#a5d8ff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#2563eb","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Project management (save/load)","fontSize":17}},
+    {"type":"rectangle","id":"p2c","x":440,"y":261,"width":320,"height":58,"backgroundColor":"#a5d8ff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#2563eb","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"PocketBase integration (real DB)","fontSize":17}},
+    {"type":"rectangle","id":"p2d","x":440,"y":334,"width":320,"height":58,"backgroundColor":"#a5d8ff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#2563eb","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Supplier order export (CSV download)","fontSize":17}},
+    {"type":"rectangle","id":"p2e","x":440,"y":407,"width":320,"height":58,"backgroundColor":"#a5d8ff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#2563eb","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Catalog managed via PocketBase","fontSize":17}},
+    {"type":"text","id":"p2_note","x":448,"y":500,"width":305,"height":70,"text":"Each feature follows:\n/office-hours  →  /opsx:propose\n→  implement  →  /review  →  /ship","fontSize":15,"strokeColor":"#1d4ed8","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"textAlign":"left","verticalAlign":"top"},
+
+    {"type":"rectangle","id":"p3a","x":840,"y":115,"width":330,"height":58,"backgroundColor":"#d0bfff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#7c3aed","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"PDF quote output (client-facing)","fontSize":17}},
+    {"type":"rectangle","id":"p3b","x":840,"y":188,"width":330,"height":58,"backgroundColor":"#d0bfff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#7c3aed","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Multi-user / team support","fontSize":17}},
+    {"type":"rectangle","id":"p3c","x":840,"y":261,"width":330,"height":58,"backgroundColor":"#d0bfff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#7c3aed","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Mobile responsive (tablet on-site)","fontSize":17}},
+    {"type":"rectangle","id":"p3d","x":840,"y":334,"width":330,"height":58,"backgroundColor":"#d0bfff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#7c3aed","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Kit builder UI (visual kit editor)","fontSize":17}},
+    {"type":"rectangle","id":"p3e","x":840,"y":407,"width":330,"height":58,"backgroundColor":"#d0bfff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#7c3aed","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"OAuth2 (Google login)","fontSize":17}},
+    {"type":"rectangle","id":"p3f","x":840,"y":480,"width":330,"height":58,"backgroundColor":"#d0bfff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#7c3aed","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Production deployment + monitoring","fontSize":17}},
+    {"type":"text","id":"p3_note","x":848,"y":570,"width":310,"height":45,"text":"Gated on client feedback\nafter Phase 2 delivery","fontSize":15,"strokeColor":"#6d28d9","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"textAlign":"left","verticalAlign":"top"}
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}
