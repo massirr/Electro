@@ -94,7 +94,7 @@ function ItemCombobox({
         aria-label={`Item, row ${rowIndex + 1}`}
         disabled={disabled}
         autoFocus={autoFocus}
-        className="w-full text-left text-sm px-3 py-2 bg-[var(--surface)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full text-left text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md hover:border-[var(--hairline-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={openDropdown}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -104,7 +104,7 @@ function ItemCombobox({
           if (e.key === "Escape") closeDropdown();
         }}
       >
-        <span className={selected ? "text-[var(--foreground)]" : "text-[var(--muted)]"}>
+        <span className={selected ? "text-[var(--ink)]" : "text-[var(--ink-subtle)]"}>
           {disabled ? "Loading…" : selected ? selected.name : "Search items…"}
         </span>
       </button>
@@ -131,7 +131,7 @@ function ItemCombobox({
                 key={item.id}
                 role="option"
                 aria-selected={item.id === value}
-                className="px-3 py-2 text-sm cursor-pointer hover:bg-[var(--border)] aria-selected:text-[var(--accent)]"
+                className="px-3 py-2 text-sm cursor-pointer hover:bg-[var(--surface-2)] aria-selected:text-[var(--accent)]"
                 onMouseDown={(e) => {
                   e.preventDefault(); // prevent blur before click
                   handleSelect(item);
@@ -251,18 +251,21 @@ export function TakeoffForm() {
   // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-10">
+    <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6">
       {/* Left: Takeoff table */}
-      <section>
-        <h2 className="text-xs font-semibold tracking-widest uppercase text-[var(--muted)] mb-3">
+      <section
+        className="rounded-lg p-6"
+        style={{ background: "var(--surface-1)", border: "1px solid var(--hairline)", boxShadow: "var(--card-shadow)" }}
+      >
+        <h2 className="text-xs font-semibold tracking-widest uppercase text-[var(--ink-muted)] mb-4">
           Takeoff
         </h2>
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="border-b border-[var(--border)]">
-              <th className="py-2 text-left font-medium text-[var(--muted)]">Item</th>
-              <th className="py-2 text-right font-medium text-[var(--muted)] w-20">Qty</th>
-              <th className="py-2 text-right font-medium text-[var(--muted)] w-20">h/u</th>
+              <th className="py-2 text-left font-medium text-[var(--ink-muted)]">Item</th>
+              <th className="py-2 text-right font-medium text-[var(--ink-muted)] w-20">Qty</th>
+              <th className="py-2 text-right font-medium text-[var(--ink-muted)] w-20">h/u</th>
               <th className="w-8" />
             </tr>
           </thead>
@@ -298,7 +301,7 @@ export function TakeoffForm() {
                       value={row.id ? row.quantity || "" : ""}
                       placeholder={row.id ? "" : "—"}
                       onChange={(e) => handleQtyChange(row.key, e.target.value)}
-                      className="w-full text-right text-sm px-2 py-2 bg-[var(--surface)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 disabled:opacity-30 [appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden tabular-nums"
+                      className="w-full text-right text-sm px-2 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 focus:border-[var(--hairline-strong)] transition-colors disabled:opacity-50 [appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden tabular-nums"
                     />
                   </td>
                   <td className="py-1.5 px-1 w-20">
@@ -317,8 +320,8 @@ export function TakeoffForm() {
                       placeholder={row.id ? "" : "—"}
                       onChange={(e) => handleHuChange(row.key, e.target.value)}
                       onKeyDown={(e) => handleHuKeyDown(e, row.key)}
-                      className={`w-full text-right text-sm px-2 py-2 bg-[var(--surface)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 disabled:opacity-30 [appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden tabular-nums ${
-                        row.isDefault ? "text-[#62666d]" : "text-[var(--foreground)]"
+                      className={`w-full text-right text-sm px-2 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 focus:border-[var(--hairline-strong)] transition-colors disabled:opacity-50 [appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden tabular-nums ${
+                        row.isDefault ? "text-[var(--ink-tertiary)]" : "text-[var(--ink)]"
                       }`}
                     />
                   </td>
@@ -341,23 +344,26 @@ export function TakeoffForm() {
         <button
           type="button"
           onClick={addRow}
-          className="mt-3 text-xs text-[var(--muted)] hover:text-[var(--foreground)] text-left transition-colors"
+          className="mt-4 flex items-center gap-1 text-xs font-medium text-[var(--ink-subtle)] border border-[var(--hairline)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] rounded-md px-3 py-1.5 transition-colors"
         >
           + Add item
         </button>
       </section>
 
       {/* Right: Quote panel */}
-      <section>
-        <div className={quoteLoading ? "opacity-50 transition-opacity" : "transition-opacity"}>
+      <section
+        className="rounded-lg"
+        style={{ background: "var(--surface-1)", border: "1px solid var(--hairline)", boxShadow: "var(--card-shadow)" }}
+      >
+        <div className={`p-6 ${quoteLoading ? "opacity-50 transition-opacity" : "transition-opacity"}`}>
           {quoteError && (
             <p className="text-xs text-[var(--error)] mb-2">{quoteError}</p>
           )}
           {quote ? (
             <QuotePreview quote={quote} />
           ) : (
-            <div className="text-sm text-[var(--muted)] pt-8">
-              Add items to see the quote.
+            <div className="flex items-center justify-center h-48">
+              <p className="text-sm text-[var(--ink-subtle)]">Add items to see the quote.</p>
             </div>
           )}
         </div>

@@ -9,7 +9,7 @@ function fmt(n: number) {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-xs font-semibold tracking-widest uppercase text-[var(--muted)] mb-3">
+    <h2 className="text-xs font-semibold tracking-widest uppercase text-[var(--ink-muted)] mb-3">
       {children}
     </h2>
   );
@@ -31,19 +31,24 @@ export function QuotePreview({ quote }: { quote: QuoteResult }) {
       {/* Summary totals */}
       <section>
         <SectionLabel>Quote Summary</SectionLabel>
-        <div className="bg-[var(--surface)] rounded-lg p-5 space-y-0">
+        <div className="bg-[var(--surface-2)] rounded-md p-5 space-y-0" style={{ border: "1px solid var(--hairline)" }}>
           {rows.map(([label, value]) => (
             <div
               key={label}
-              className="flex justify-between py-2 text-sm border-b border-[var(--border)]"
+              className="flex justify-between py-2 text-sm border-b border-[var(--hairline)]"
             >
-              <span className="text-[var(--muted)]">{label}</span>
-              <span className="tabular-nums">{fmt(value)}</span>
+              <span className="text-[var(--ink-muted)]">{label}</span>
+              <span className="tabular-nums text-[var(--ink)]">{fmt(value)}</span>
             </div>
           ))}
-          <div className="flex justify-between pt-4 text-base font-bold">
-            <span>Grand Total</span>
-            <span className="tabular-nums text-[var(--accent)]">{fmt(quote.grandTotal)}</span>
+          <div className="flex justify-between items-baseline pt-4 mt-1">
+            <span className="text-sm font-medium text-[var(--ink-muted)]">Grand Total</span>
+            <span
+              className="tabular-nums font-semibold text-[var(--accent)]"
+              style={{ fontSize: "24px", letterSpacing: "-0.4px" }}
+            >
+              {fmt(quote.grandTotal)}
+            </span>
           </div>
         </div>
       </section>

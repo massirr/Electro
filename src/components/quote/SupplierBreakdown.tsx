@@ -12,9 +12,9 @@ export function SupplierBreakdown({ groups }: { groups: SupplierGroup[] }) {
       {sorted.map((g) => {
         const total = g.lines.reduce((s, l) => s + l.totalPrice, 0);
         return (
-          <div key={g.supplier} className="flex justify-between text-sm py-1 border-b border-[var(--border)]">
-            <span>{g.supplier}</span>
-            <span className="tabular-nums">{fmt(total)}</span>
+          <div key={g.supplier} className="flex justify-between text-sm py-2 border-b border-[var(--hairline)]">
+            <span className="text-[var(--ink)]">{g.supplier}</span>
+            <span className="tabular-nums text-[var(--ink)]">{fmt(total)}</span>
           </div>
         );
       })}
