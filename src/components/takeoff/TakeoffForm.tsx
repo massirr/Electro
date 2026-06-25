@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { CatalogItem } from "@/app/api/catalog/route";
 import type { TakeoffItem } from "@/domain/types";
 import { useQuote } from "@/hooks/useQuote";
@@ -199,10 +199,15 @@ export function TakeoffForm() {
     }
   }, [rows]);
 
-  // useQuote consumes TakeoffItem[] — map from FormRow
-  const takeoffItems: TakeoffItem[] = rows
-    .filter((r) => r.id !== "")
-    .map((r) => ({ id: r.id, name: r.name, quantity: r.quantity, hoursPerUnit: r.hoursPerUnit }));
+  // Memoized so reference stays stable between renders that don't change row data.
+  // Without useMemo, a new array is created every render → useQuote effect fires → POST spam.
+  const takeoffItems = useMemo(
+    () =>
+      rows
+        .filter((r) => r.id !== "")
+        .map((r) => ({ id: r.id, name: r.name, quantity: r.quantity, hoursPerUnit: r.hoursPerUnit })),
+    [rows]
+  );
 
   const { quote, isLoading: quoteLoading, error: quoteError } = useQuote(takeoffItems);
 
@@ -355,7 +360,7 @@ export function TakeoffForm() {
         className="rounded-lg"
         style={{ background: "var(--surface-1)", border: "1px solid var(--hairline)", boxShadow: "var(--card-shadow)" }}
       >
-        <div className={`p-6 ${quoteLoading ? "opacity-50 transition-opacity" : "transition-opacity"}`}>
+        <div className={`p-6 transition-opacity ${quoteLoading && !quote ? "opacity-50" : ""}`}>
           {quoteError && (
             <p className="text-xs text-[var(--error)] mb-2">{quoteError}</p>
           )}
