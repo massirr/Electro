@@ -3,46 +3,731 @@
   "version": 2,
   "source": "https://excalidraw.com",
   "elements": [
-    {"type":"text","id":"title","x":300,"y":12,"width":600,"height":32,"text":"Electro — Quote Pipeline (Data Flow)","fontSize":26,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"textAlign":"left","verticalAlign":"top"},
-
-    {"type":"rectangle","id":"user","x":80,"y":70,"width":260,"height":80,"backgroundColor":"#a5d8ff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#2563eb","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Estimator enters item + qty\n(reading from blueprint)","fontSize":17}},
-    {"type":"arrow","id":"a1","x":210,"y":150,"width":0,"height":40,"points":[[0,0],[0,40]],"strokeColor":"#1e1e1e","strokeWidth":2,"endArrowhead":"arrow","roughness":1,"opacity":100},
-
-    {"type":"rectangle","id":"takeoff","x":80,"y":190,"width":260,"height":120,"backgroundColor":"#a5d8ff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#2563eb","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"TakeoffForm\nrows state (React)\nuseMemo → TakeoffItem[]","fontSize":17}},
-    {"type":"text","id":"memo_note","x":355,"y":228,"width":240,"height":72,"text":"useMemo stabilises\narray reference so\nuseEffect only fires\non real data change","fontSize":14,"strokeColor":"#7c3aed","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"textAlign":"left","verticalAlign":"top"},
-    {"type":"arrow","id":"a2","x":210,"y":310,"width":0,"height":50,"points":[[0,0],[0,50]],"strokeColor":"#1e1e1e","strokeWidth":2,"endArrowhead":"arrow","roughness":1,"opacity":100},
-
-    {"type":"rectangle","id":"hook","x":80,"y":360,"width":260,"height":90,"backgroundColor":"#d0bfff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#7c3aed","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"useQuote hook\n300ms debounce\nabort in-flight if stale","fontSize":17}},
-    {"type":"arrow","id":"a3","x":210,"y":450,"width":0,"height":50,"points":[[0,0],[0,50]],"strokeColor":"#7c3aed","strokeWidth":2,"endArrowhead":"arrow","roughness":1,"opacity":100,"label":{"text":"POST","fontSize":16}},
-
-    {"type":"rectangle","id":"api","x":80,"y":500,"width":260,"height":75,"backgroundColor":"#d0bfff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#7c3aed","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"POST /api/quote\n{ takeoff, settings }","fontSize":17}},
-    {"type":"rectangle","id":"cache","x":420,"y":490,"width":300,"height":100,"backgroundColor":"#fff3bf","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#b45309","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"getDataCache()\nloads on first request only:\nsample-catalog.csv · sample-kits.json","fontSize":16}},
-    {"type":"arrow","id":"a_cache","x":420,"y":540,"width":-80,"height":0,"points":[[0,0],[-80,0]],"strokeColor":"#b45309","strokeWidth":2,"endArrowhead":"arrow","roughness":1,"opacity":100,"label":{"text":"catalog, kits","fontSize":14}},
-    {"type":"arrow","id":"a4","x":210,"y":575,"width":0,"height":55,"points":[[0,0],[0,55]],"strokeColor":"#1e1e1e","strokeWidth":2,"endArrowhead":"arrow","roughness":1,"opacity":100},
-
-    {"type":"rectangle","id":"bq_bg","x":40,"y":630,"width":680,"height":250,"backgroundColor":"#d3f9d8","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":1,"opacity":50,"roughness":1},
-    {"type":"text","id":"bq_lbl","x":50,"y":638,"width":600,"height":22,"text":"buildQuote( takeoff, kits, catalog, settings )","fontSize":18,"strokeColor":"#15803d","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"textAlign":"left","verticalAlign":"top"},
-    {"type":"rectangle","id":"expand","x":65,"y":668,"width":190,"height":55,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"expandKits()\n→ LineItem[]","fontSize":16}},
-    {"type":"rectangle","id":"labor","x":275,"y":668,"width":190,"height":55,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"calcLaborTotal()\n85 CAD/hr","fontSize":16}},
-    {"type":"rectangle","id":"mats","x":485,"y":668,"width":205,"height":55,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"calcMaterialTotal()\n→ sum lineItems","fontSize":16}},
-    {"type":"arrow","id":"ba1","x":255,"y":695,"width":20,"height":0,"points":[[0,0],[20,0]],"strokeColor":"#15803d","strokeWidth":1,"endArrowhead":"arrow","roughness":1,"opacity":100},
-    {"type":"arrow","id":"ba2","x":465,"y":695,"width":20,"height":0,"points":[[0,0],[20,0]],"strokeColor":"#15803d","strokeWidth":1,"endArrowhead":"arrow","roughness":1,"opacity":100},
-    {"type":"rectangle","id":"subtot","x":65,"y":745,"width":190,"height":50,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"subtotal = labor + materials","fontSize":15}},
-    {"type":"rectangle","id":"margin","x":275,"y":745,"width":190,"height":50,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"applyMargin(subtotal, 15%)","fontSize":15}},
-    {"type":"rectangle","id":"vat","x":485,"y":745,"width":205,"height":50,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"applyVAT(subtotal+margin, 21%)","fontSize":15}},
-    {"type":"arrow","id":"ba3","x":255,"y":770,"width":20,"height":0,"points":[[0,0],[20,0]],"strokeColor":"#15803d","strokeWidth":1,"endArrowhead":"arrow","roughness":1,"opacity":100},
-    {"type":"arrow","id":"ba4","x":465,"y":770,"width":20,"height":0,"points":[[0,0],[20,0]],"strokeColor":"#15803d","strokeWidth":1,"endArrowhead":"arrow","roughness":1,"opacity":100},
-    {"type":"rectangle","id":"gtotal","x":160,"y":820,"width":400,"height":45,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#15803d","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"grandTotal = subtotal + margin + vat","fontSize":16}},
-    {"type":"arrow","id":"a5","x":210,"y":880,"width":0,"height":50,"points":[[0,0],[0,50]],"strokeColor":"#1e1e1e","strokeWidth":2,"endArrowhead":"arrow","roughness":1,"opacity":100},
-
-    {"type":"rectangle","id":"result","x":80,"y":930,"width":260,"height":65,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#16a34a","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"QuoteResult JSON response","fontSize":17}},
-    {"type":"arrow","id":"a6","x":210,"y":995,"width":0,"height":50,"points":[[0,0],[0,50]],"strokeColor":"#16a34a","strokeWidth":2,"endArrowhead":"arrow","roughness":1,"opacity":100},
-
-    {"type":"rectangle","id":"qp_bg","x":40,"y":1045,"width":720,"height":120,"backgroundColor":"#d3f9d8","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#16a34a","strokeWidth":1,"opacity":50,"roughness":1},
-    {"type":"text","id":"qp_lbl","x":50,"y":1053,"width":500,"height":22,"text":"QuotePreview (re-renders with new data)","fontSize":18,"strokeColor":"#15803d","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"textAlign":"left","verticalAlign":"top"},
-    {"type":"rectangle","id":"qs","x":65,"y":1080,"width":200,"height":60,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#16a34a","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Quote Summary\nLabor · Materials\nMargin · VAT · Total","fontSize":15}},
-    {"type":"rectangle","id":"bs","x":285,"y":1080,"width":195,"height":60,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#16a34a","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"By Supplier\nCEBO · Rexel","fontSize":16}},
-    {"type":"rectangle","id":"li","x":498,"y":1080,"width":230,"height":60,"backgroundColor":"#b2f2bb","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#16a34a","strokeWidth":2,"roughness":1,"opacity":100,"label":{"text":"Line Items Table\nSKU · Name · Qty · Price","fontSize":16}}
+    {
+      "type": "text",
+      "id": "title",
+      "x": 300,
+      "y": 12,
+      "width": 600,
+      "height": 32,
+      "text": "Electro — Quote Pipeline (Data Flow)",
+      "fontSize": 26,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "roughness": 0,
+      "opacity": 100,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "fontFamily": 5
+    },
+    {
+      "type": "rectangle",
+      "id": "user",
+      "x": 80,
+      "y": 70,
+      "width": 260,
+      "height": 80,
+      "backgroundColor": "#a5d8ff",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#2563eb",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "Estimator enters item + qty\n(reading from blueprint)",
+        "fontSize": 17,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "a1",
+      "x": 210,
+      "y": 150,
+      "width": 0,
+      "height": 40,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          40
+        ]
+      ],
+      "strokeColor": "#1e1e1e",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "roughness": 1,
+      "opacity": 100
+    },
+    {
+      "type": "rectangle",
+      "id": "takeoff",
+      "x": 80,
+      "y": 190,
+      "width": 260,
+      "height": 120,
+      "backgroundColor": "#a5d8ff",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#2563eb",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "TakeoffForm\nrows state (React)\nuseMemo → TakeoffItem[]",
+        "fontSize": 17,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "text",
+      "id": "memo_note",
+      "x": 355,
+      "y": 228,
+      "width": 240,
+      "height": 72,
+      "text": "useMemo stabilises\narray reference so\nuseEffect only fires\non real data change",
+      "fontSize": 14,
+      "strokeColor": "#7c3aed",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "roughness": 0,
+      "opacity": 100,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "fontFamily": 5
+    },
+    {
+      "type": "arrow",
+      "id": "a2",
+      "x": 210,
+      "y": 310,
+      "width": 0,
+      "height": 50,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          50
+        ]
+      ],
+      "strokeColor": "#1e1e1e",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "roughness": 1,
+      "opacity": 100
+    },
+    {
+      "type": "rectangle",
+      "id": "hook",
+      "x": 80,
+      "y": 360,
+      "width": 260,
+      "height": 90,
+      "backgroundColor": "#d0bfff",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#7c3aed",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "useQuote hook\n300ms debounce\nabort in-flight if stale",
+        "fontSize": 17,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "a3",
+      "x": 210,
+      "y": 450,
+      "width": 0,
+      "height": 50,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          50
+        ]
+      ],
+      "strokeColor": "#7c3aed",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "POST",
+        "fontSize": 16,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "api",
+      "x": 80,
+      "y": 500,
+      "width": 260,
+      "height": 75,
+      "backgroundColor": "#d0bfff",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#7c3aed",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "POST /api/quote\n{ takeoff, settings }",
+        "fontSize": 17,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "cache",
+      "x": 420,
+      "y": 490,
+      "width": 300,
+      "height": 100,
+      "backgroundColor": "#fff3bf",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#b45309",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "getDataCache()\nloads on first request only:\nsample-catalog.csv · sample-kits.json",
+        "fontSize": 16,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "a_cache",
+      "x": 420,
+      "y": 540,
+      "width": -80,
+      "height": 0,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -80,
+          0
+        ]
+      ],
+      "strokeColor": "#b45309",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "catalog, kits",
+        "fontSize": 14,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "a4",
+      "x": 210,
+      "y": 575,
+      "width": 0,
+      "height": 55,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          55
+        ]
+      ],
+      "strokeColor": "#1e1e1e",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "roughness": 1,
+      "opacity": 100
+    },
+    {
+      "type": "rectangle",
+      "id": "bq_bg",
+      "x": 40,
+      "y": 630,
+      "width": 680,
+      "height": 250,
+      "backgroundColor": "#d3f9d8",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#15803d",
+      "strokeWidth": 1,
+      "opacity": 50,
+      "roughness": 1
+    },
+    {
+      "type": "text",
+      "id": "bq_lbl",
+      "x": 50,
+      "y": 638,
+      "width": 600,
+      "height": 22,
+      "text": "buildQuote( takeoff, kits, catalog, settings )",
+      "fontSize": 18,
+      "strokeColor": "#15803d",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "roughness": 0,
+      "opacity": 100,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "fontFamily": 5
+    },
+    {
+      "type": "rectangle",
+      "id": "expand",
+      "x": 65,
+      "y": 668,
+      "width": 190,
+      "height": 55,
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#15803d",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "expandKits()\n→ LineItem[]",
+        "fontSize": 16,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "labor",
+      "x": 275,
+      "y": 668,
+      "width": 190,
+      "height": 55,
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#15803d",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "calcLaborTotal()\n85 CAD/hr",
+        "fontSize": 16,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "mats",
+      "x": 485,
+      "y": 668,
+      "width": 205,
+      "height": 55,
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#15803d",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "calcMaterialTotal()\n→ sum lineItems",
+        "fontSize": 16,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "ba1",
+      "x": 255,
+      "y": 695,
+      "width": 20,
+      "height": 0,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          20,
+          0
+        ]
+      ],
+      "strokeColor": "#15803d",
+      "strokeWidth": 1,
+      "endArrowhead": "arrow",
+      "roughness": 1,
+      "opacity": 100
+    },
+    {
+      "type": "arrow",
+      "id": "ba2",
+      "x": 465,
+      "y": 695,
+      "width": 20,
+      "height": 0,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          20,
+          0
+        ]
+      ],
+      "strokeColor": "#15803d",
+      "strokeWidth": 1,
+      "endArrowhead": "arrow",
+      "roughness": 1,
+      "opacity": 100
+    },
+    {
+      "type": "rectangle",
+      "id": "subtot",
+      "x": 65,
+      "y": 745,
+      "width": 190,
+      "height": 50,
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#15803d",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "subtotal = labor + materials",
+        "fontSize": 15,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "margin",
+      "x": 275,
+      "y": 745,
+      "width": 190,
+      "height": 50,
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#15803d",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "applyMargin(subtotal, 15%)",
+        "fontSize": 15,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "vat",
+      "x": 485,
+      "y": 745,
+      "width": 205,
+      "height": 50,
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#15803d",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "applyVAT(subtotal+margin, 21%)",
+        "fontSize": 15,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "ba3",
+      "x": 255,
+      "y": 770,
+      "width": 20,
+      "height": 0,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          20,
+          0
+        ]
+      ],
+      "strokeColor": "#15803d",
+      "strokeWidth": 1,
+      "endArrowhead": "arrow",
+      "roughness": 1,
+      "opacity": 100
+    },
+    {
+      "type": "arrow",
+      "id": "ba4",
+      "x": 465,
+      "y": 770,
+      "width": 20,
+      "height": 0,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          20,
+          0
+        ]
+      ],
+      "strokeColor": "#15803d",
+      "strokeWidth": 1,
+      "endArrowhead": "arrow",
+      "roughness": 1,
+      "opacity": 100
+    },
+    {
+      "type": "rectangle",
+      "id": "gtotal",
+      "x": 160,
+      "y": 820,
+      "width": 400,
+      "height": 45,
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#15803d",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "grandTotal = subtotal + margin + vat",
+        "fontSize": 16,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "a5",
+      "x": 210,
+      "y": 880,
+      "width": 0,
+      "height": 50,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          50
+        ]
+      ],
+      "strokeColor": "#1e1e1e",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "roughness": 1,
+      "opacity": 100
+    },
+    {
+      "type": "rectangle",
+      "id": "result",
+      "x": 80,
+      "y": 930,
+      "width": 260,
+      "height": 65,
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#16a34a",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "QuoteResult JSON response",
+        "fontSize": 17,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "a6",
+      "x": 210,
+      "y": 995,
+      "width": 0,
+      "height": 50,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          50
+        ]
+      ],
+      "strokeColor": "#16a34a",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "roughness": 1,
+      "opacity": 100
+    },
+    {
+      "type": "rectangle",
+      "id": "qp_bg",
+      "x": 40,
+      "y": 1045,
+      "width": 720,
+      "height": 120,
+      "backgroundColor": "#d3f9d8",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#16a34a",
+      "strokeWidth": 1,
+      "opacity": 50,
+      "roughness": 1
+    },
+    {
+      "type": "text",
+      "id": "qp_lbl",
+      "x": 50,
+      "y": 1053,
+      "width": 500,
+      "height": 22,
+      "text": "QuotePreview (re-renders with new data)",
+      "fontSize": 18,
+      "strokeColor": "#15803d",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "roughness": 0,
+      "opacity": 100,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "fontFamily": 5
+    },
+    {
+      "type": "rectangle",
+      "id": "qs",
+      "x": 65,
+      "y": 1080,
+      "width": 200,
+      "height": 60,
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#16a34a",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "Quote Summary\nLabor · Materials\nMargin · VAT · Total",
+        "fontSize": 15,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "bs",
+      "x": 285,
+      "y": 1080,
+      "width": 195,
+      "height": 60,
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#16a34a",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "By Supplier\nCEBO · Rexel",
+        "fontSize": 16,
+        "fontFamily": 5
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "li",
+      "x": 498,
+      "y": 1080,
+      "width": 230,
+      "height": 60,
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#16a34a",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "label": {
+        "text": "Line Items Table\nSKU · Name · Qty · Price",
+        "fontSize": 16,
+        "fontFamily": 5
+      }
+    }
   ],
   "appState": {
     "gridSize": null,
