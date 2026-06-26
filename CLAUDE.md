@@ -39,6 +39,9 @@ For each OpenSpec change: propose → eng-review → apply → review → ship �
 docs/domain-knowledge.md is the source of truth for Belgian electrician business rules (VAT, catalog, quotes, BTW, account types).
 Whenever new domain context arrives in conversation — from the user, client feedback, or research — update docs/domain-knowledge.md immediately before continuing.
 
+## Runtime
+Package manager is **Bun**. Always use `bun dev`, `bun test`, `bun run <script>`. Never `npm run` or `npx`.
+
 ## Design
 UI must follow DESIGN.md (Linear style: dark #0F0F0F, Inter font, purple accent #5E6AD2).
 
