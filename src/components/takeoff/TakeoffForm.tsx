@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { CatalogItem } from "@/app/api/catalog/route";
-import type { TakeoffItem } from "@/domain/types";
+import type { JobType, TakeoffItem } from "@/domain/types";
 import { useQuote } from "@/hooks/useQuote";
 import { QuotePreview } from "@/components/quote/QuotePreview";
 
@@ -15,6 +15,21 @@ interface FormRow {
   quantity: number;
   hoursPerUnit: number;
   isDefault: boolean;
+}
+
+interface LoadTarget {
+  project: {
+    name: string;
+    jobType: JobType;
+    hourlyRate: number;
+    marginPercent: number;
+  };
+  items: Array<{
+    externalItemId: string;
+    name: string;
+    quantity: number;
+    hoursPerUnit: number;
+  }>;
 }
 
 function blankRow(key: string): FormRow {
@@ -152,12 +167,29 @@ function ItemCombobox({
 
 // ─── TakeoffForm ───────────────────────────────────────────────────────────────
 
-export function TakeoffForm() {
+export function TakeoffForm({
+  loadTarget,
+  onSaved,
+}: {
+  loadTarget: LoadTarget | null;
+  onSaved: () => void;
+}) {
   const [catalog, setCatalog] = useState<CatalogItem[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(true);
   const nextKeyRef = useRef(2);
   function nextKey() { return String(nextKeyRef.current++); }
   const [rows, setRows] = useState<FormRow[]>(() => [blankRow("1")]);
+
+  // Quote settings
+  const [projectName, setProjectName] = useState("");
+  const [jobType, setJobType] = useState<JobType>("new-build");
+  const [hourlyRate] = useState(85);
+  const [marginPercent] = useState(15);
+
+  // Save state
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveOk, setSaveOk] = useState(false);
 
   const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
   function qtyRefFor(key: string): React.RefObject<HTMLInputElement | null> {
@@ -199,17 +231,42 @@ export function TakeoffForm() {
     }
   }, [rows]);
 
+  // Load a saved quote into the form
+  useEffect(() => {
+    if (!loadTarget) return;
+    const { project, items } = loadTarget;
+    setProjectName(project.name);
+    setJobType(project.jobType);
+    const newRows = items.map((item) => ({
+      key: String(nextKeyRef.current++),
+      id: item.externalItemId,
+      name: item.name,
+      quantity: item.quantity,
+      hoursPerUnit: item.hoursPerUnit,
+      isDefault: false,
+    }));
+    setRows(newRows.length > 0 ? newRows : [blankRow(nextKey())]);
+    setSaveOk(false);
+    setSaveError(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadTarget]);
+
+  const settings = useMemo(
+    () => ({ hourlyRate, jobType, marginPercent }),
+    [hourlyRate, jobType, marginPercent]
+  );
+
   // Memoized so reference stays stable between renders that don't change row data.
   // Without useMemo, a new array is created every render → useQuote effect fires → POST spam.
   const takeoffItems = useMemo(
     () =>
       rows
         .filter((r) => r.id !== "")
-        .map((r) => ({ id: r.id, name: r.name, quantity: r.quantity, hoursPerUnit: r.hoursPerUnit })),
+        .map((r): TakeoffItem => ({ id: r.id, name: r.name, quantity: r.quantity, hoursPerUnit: r.hoursPerUnit })),
     [rows]
   );
 
-  const { quote, isLoading: quoteLoading, error: quoteError } = useQuote(takeoffItems);
+  const { quote, isLoading: quoteLoading, error: quoteError } = useQuote(takeoffItems, settings);
 
   // ── Row mutations ────────────────────────────────────────────────────────────
 
@@ -249,7 +306,34 @@ export function TakeoffForm() {
     if (e.key === "Enter") {
       const isLast = rows[rows.length - 1].key === rowKey;
       if (isLast) addRow();
-      // Focus is handled by tabbing to next row's combobox naturally
+    }
+  }
+
+  // ── Save ─────────────────────────────────────────────────────────────────────
+
+  async function handleSave() {
+    if (!projectName.trim()) { setSaveError("Project name required"); return; }
+    if (takeoffItems.length === 0) { setSaveError("Add at least one item"); return; }
+    setSaving(true);
+    setSaveError(null);
+    setSaveOk(false);
+    try {
+      const res = await fetch("/api/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: projectName.trim(), jobType, hourlyRate, marginPercent, rows: takeoffItems }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        setSaveError((err as { error?: string }).error ?? "Save failed");
+        return;
+      }
+      setSaveOk(true);
+      onSaved();
+    } catch {
+      setSaveError("Save failed — is PocketBase running?");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -265,6 +349,34 @@ export function TakeoffForm() {
         <h2 className="text-xs font-semibold tracking-widest uppercase text-[var(--ink-muted)] mb-4">
           Takeoff
         </h2>
+
+        {/* Project name */}
+        <input
+          type="text"
+          placeholder="Project name…"
+          value={projectName}
+          onChange={(e) => { setProjectName(e.target.value); setSaveOk(false); }}
+          className="w-full text-sm px-3 py-2 mb-3 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
+        />
+
+        {/* Job type toggle */}
+        <div className="flex gap-1 mb-4">
+          {(["renovation", "new-build"] as const).map((jt) => (
+            <button
+              key={jt}
+              type="button"
+              onClick={() => setJobType(jt)}
+              className={`flex-1 text-xs py-1.5 rounded border transition-colors ${
+                jobType === jt
+                  ? "bg-[var(--accent)] border-[var(--accent)] text-white"
+                  : "border-[var(--hairline)] text-[var(--ink-subtle)] hover:border-[var(--hairline-strong)] hover:text-[var(--ink)]"
+              }`}
+            >
+              {jt === "renovation" ? "Renovation (6%)" : "New build (21%)"}
+            </button>
+          ))}
+        </div>
+
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="border-b border-[var(--border)]">
@@ -346,13 +458,32 @@ export function TakeoffForm() {
             })}
           </tbody>
         </table>
-        <button
-          type="button"
-          onClick={addRow}
-          className="mt-4 flex items-center gap-1 text-xs font-medium text-[var(--ink-subtle)] border border-[var(--hairline)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] rounded-md px-3 py-1.5 transition-colors"
-        >
-          + Add item
-        </button>
+
+        <div className="mt-4 flex items-center">
+          <button
+            type="button"
+            onClick={addRow}
+            className="flex items-center gap-1 text-xs font-medium text-[var(--ink-subtle)] border border-[var(--hairline)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] rounded-md px-3 py-1.5 transition-colors"
+          >
+            + Add item
+          </button>
+        </div>
+
+        {/* Save area */}
+        <div className="mt-4 pt-4 border-t border-[var(--hairline)]">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving}
+              className="text-xs font-medium px-4 py-2 rounded-md bg-[var(--accent)] text-white hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {saving ? "Saving…" : "Save quote"}
+            </button>
+            {saveOk && <span className="text-xs text-[#4caf75]">Saved</span>}
+            {saveError && <span className="text-xs text-[#e5533d]">{saveError}</span>}
+          </div>
+        </div>
       </section>
 
       {/* Right: Quote panel */}

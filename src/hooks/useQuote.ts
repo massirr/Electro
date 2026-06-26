@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import type { QuoteResult, TakeoffItem } from "@/domain/types";
+import type { QuoteResult, QuoteSettings, TakeoffItem } from "@/domain/types";
 
-const SETTINGS = { hourlyRate: 85, jobType: "new-build" as const, marginPercent: 15 };
 const DEBOUNCE_MS = 300;
 
-export function useQuote(rows: TakeoffItem[]) {
+export function useQuote(rows: TakeoffItem[], settings: QuoteSettings) {
   const [quote, setQuote] = useState<QuoteResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +22,7 @@ export function useQuote(rows: TakeoffItem[]) {
       const res = await fetch("/api/quote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ takeoff, settings: SETTINGS }),
+        body: JSON.stringify({ takeoff, settings }),
         signal: controller.signal,
       });
       if (!res.ok) throw new Error(`Quote API error: ${res.status}`);

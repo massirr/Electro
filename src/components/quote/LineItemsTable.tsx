@@ -1,7 +1,7 @@
 import type { LineItem } from "@/domain/types";
 
 function fmt(n: number) {
-  return n.toLocaleString("en-CA", { style: "currency", currency: "CAD" });
+  return n.toLocaleString("fr-BE", { style: "currency", currency: "EUR" });
 }
 
 export function LineItemsTable({ items }: { items: LineItem[] }) {
