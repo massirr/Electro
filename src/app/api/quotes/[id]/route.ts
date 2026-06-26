@@ -12,7 +12,8 @@ export async function GET(
       filter: `project = "${id}"`,
     });
     return NextResponse.json({ project, items });
-  } catch {
+  } catch (err) {
+    console.error("[GET /api/quotes/:id]", err);
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 }
@@ -26,7 +27,8 @@ export async function DELETE(
     // takeoff_items have cascadeDelete on project relation — deleting project removes them
     await pb.collection("projects").delete(id);
     return new NextResponse(null, { status: 204 });
-  } catch {
+  } catch (err) {
+    console.error("[DELETE /api/quotes/:id]", err);
     return NextResponse.json({ error: "Not found or service unavailable" }, { status: 404 });
   }
 }

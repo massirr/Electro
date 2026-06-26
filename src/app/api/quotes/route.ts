@@ -26,7 +26,8 @@ export async function GET() {
       fields: "id,name,projectDate,grandTotal,created",
     });
     return NextResponse.json(records);
-  } catch {
+  } catch (err) {
+    console.error("[GET /api/quotes]", err);
     return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
   }
 }
@@ -85,7 +86,8 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json({ id: project.id, name: project.name }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("[POST /api/quotes]", err);
     return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
   }
 }
