@@ -4,7 +4,7 @@ import { SupplierBreakdown } from "./SupplierBreakdown";
 import { LineItemsTable } from "./LineItemsTable";
 
 function fmt(n: number) {
-  return n.toLocaleString("en-CA", { style: "currency", currency: "CAD" });
+  return n.toLocaleString("fr-BE", { style: "currency", currency: "EUR" });
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -17,13 +17,15 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 export function QuotePreview({ quote }: { quote: QuoteResult }) {
   const groups = groupBySupplier(quote.lineItems);
+  const laborVatPct = quote.jobType === "renovation" ? "6%" : "21%";
 
   const rows: [string, number][] = [
     ["Labor", quote.laborTotal],
     ["Materials", quote.materialTotal],
     ["Subtotal", quote.subtotal],
     ["Margin 15%", quote.margin],
-    ["VAT 21%", quote.vat],
+    [`Labor VAT ${laborVatPct}`, quote.laborVat],
+    ["Materials VAT 6%", quote.materialVat],
   ];
 
   return (

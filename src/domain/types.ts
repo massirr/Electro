@@ -32,12 +32,16 @@ export interface LineItem {
   totalPrice: number;
 }
 
+export type JobType = "renovation" | "new-build";
+
 export interface QuoteResult {
+  jobType: JobType;
   laborTotal: number;
   materialTotal: number;
   subtotal: number;
   margin: number;
-  vat: number;
+  laborVat: number;
+  materialVat: number;
   grandTotal: number;
   lineItems: LineItem[];
 }
@@ -49,6 +53,6 @@ export interface SupplierGroup {
 
 export interface QuoteSettings {
   hourlyRate: number;
-  vatPercent: number;
+  jobType: JobType;
   marginPercent: number;
 }

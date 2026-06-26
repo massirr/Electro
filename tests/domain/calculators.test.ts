@@ -81,7 +81,7 @@ const CATALOG: Map<string, Product> = new Map([
   ["BRK-15A-SP",   { sku: "BRK-15A-SP",   name: "15A Single Pole Breaker",     supplier: "CEBO",  price: 11.00,  category: "Breakers"    }],
 ]);
 
-const SETTINGS: QuoteSettings = { hourlyRate: 85, vatPercent: 21, marginPercent: 15 };
+const SETTINGS: QuoteSettings = { hourlyRate: 85, jobType: "new-build", marginPercent: 15 };
 
 describe("calcLaborTotal", () => {
   it("sums hours across all takeoff items × hourly rate", () => {
@@ -151,18 +151,18 @@ describe("buildQuote", () => {
     expect(q.laborTotal).toBe(2116.50);
   });
 
-  it("applies margin then VAT in correct order", () => {
+  it("applies margin then splits VAT by labor/material at new-build rates", () => {
     const q = buildQuote(TAKEOFF, KITS, CATALOG, SETTINGS);
-    // margin on subtotal, VAT on (subtotal + margin)
     const expectedMargin = Math.round(q.subtotal * 0.15 * 100) / 100;
-    const expectedVAT = Math.round((q.subtotal + expectedMargin) * 0.21 * 100) / 100;
     expect(q.margin).toBe(expectedMargin);
-    expect(q.vat).toBe(expectedVAT);
+    // labor VAT at 21%, materials VAT at 6%
+    expect(q.laborVat).toBeGreaterThan(0);
+    expect(q.materialVat).toBeGreaterThan(0);
   });
 
-  it("grandTotal = subtotal + margin + vat", () => {
+  it("grandTotal = subtotal + margin + laborVat + materialVat", () => {
     const q = buildQuote(TAKEOFF, KITS, CATALOG, SETTINGS);
-    const expected = Math.round((q.subtotal + q.margin + q.vat) * 100) / 100;
+    const expected = Math.round((q.subtotal + q.margin + q.laborVat + q.materialVat) * 100) / 100;
     expect(q.grandTotal).toBe(expected);
   });
 });

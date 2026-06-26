@@ -24,7 +24,7 @@ describe("loadTakeoff", () => {
   it("parses settings correctly", async () => {
     const { settings } = await loadTakeoff(`${SAMPLE_DIR}/sample-takeoff.json`);
     expect(settings.hourlyRate).toBe(85);
-    expect(settings.vatPercent).toBe(21);
+    expect(settings.jobType).toBe("new-build");
     expect(settings.marginPercent).toBe(15);
   });
 });
@@ -67,12 +67,14 @@ describe("loadKits", () => {
 describe("exportQuoteCsv", () => {
   it("produces header + rows with correct column count", () => {
     const quote: QuoteResult = {
+      jobType: "new-build",
       laborTotal: 100,
       materialTotal: 50,
       subtotal: 150,
       margin: 22.5,
-      vat: 36.23,
-      grandTotal: 208.73,
+      laborVat: 34.73,
+      materialVat: 4.19,
+      grandTotal: 211.42,
       lineItems: [
         { sku: "REC-600-WH", name: 'Recessed 6" LED', supplier: "CEBO", quantity: 12, unitPrice: 24.50, totalPrice: 294 },
       ],

@@ -38,9 +38,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!settings?.hourlyRate || !settings?.vatPercent || !settings?.marginPercent) {
+  if (!settings?.hourlyRate || !settings?.jobType || !settings?.marginPercent) {
     return NextResponse.json(
-      { error: "settings must include hourlyRate, vatPercent, marginPercent" },
+      { error: "settings must include hourlyRate, jobType, marginPercent" },
+      { status: 400 }
+    );
+  }
+  if (settings.jobType !== "renovation" && settings.jobType !== "new-build") {
+    return NextResponse.json(
+      { error: "jobType must be 'renovation' or 'new-build'" },
       { status: 400 }
     );
   }

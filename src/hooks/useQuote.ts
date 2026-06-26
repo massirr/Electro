@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { QuoteResult, TakeoffItem } from "@/domain/types";
 
-const SETTINGS = { hourlyRate: 85, vatPercent: 21, marginPercent: 15 };
+const SETTINGS = { hourlyRate: 85, jobType: "new-build" as const, marginPercent: 15 };
 const DEBOUNCE_MS = 300;
 
 export function useQuote(rows: TakeoffItem[]) {

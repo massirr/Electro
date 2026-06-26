@@ -31,8 +31,13 @@ For each OpenSpec change: propose → eng-review → apply → review → ship �
 ## Start of every session
 1. Read docs/MASTER_PLAN.md — find the last completed checkpoint
 2. Read AGENTS.md — confirm stack and quality gates
-3. Resume from the next uncompleted step in the plan
-4. Do not skip steps. Do not build without an approved spec.
+3. Read docs/domain-knowledge.md — load Belgian electrician domain context
+4. Resume from the next uncompleted step in the plan
+5. Do not skip steps. Do not build without an approved spec.
+
+## Domain knowledge
+docs/domain-knowledge.md is the source of truth for Belgian electrician business rules (VAT, catalog, quotes, BTW, account types).
+Whenever new domain context arrives in conversation — from the user, client feedback, or research — update docs/domain-knowledge.md immediately before continuing.
 
 ## Design
 UI must follow DESIGN.md (Linear style: dark #0F0F0F, Inter font, purple accent #5E6AD2).

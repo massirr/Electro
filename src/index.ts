@@ -14,15 +14,16 @@ const quote = buildQuote(items, kits, catalog, settings);
 const groups = groupBySupplier(quote.lineItems);
 
 console.log(`\n=== Electro Quote — ${project} ===\n`);
-console.log(`Labor:     $${quote.laborTotal.toFixed(2)}`);
-console.log(`Materials: $${quote.materialTotal.toFixed(2)}`);
-console.log(`Subtotal:  $${quote.subtotal.toFixed(2)}`);
-console.log(`Margin 15%: $${quote.margin.toFixed(2)}`);
-console.log(`VAT 21%:   $${quote.vat.toFixed(2)}`);
-console.log(`GRAND TOTAL: $${quote.grandTotal.toFixed(2)}`);
+console.log(`Labor:     €${quote.laborTotal.toFixed(2)}`);
+console.log(`Materials: €${quote.materialTotal.toFixed(2)}`);
+console.log(`Subtotal:  €${quote.subtotal.toFixed(2)}`);
+console.log(`Margin 15%: €${quote.margin.toFixed(2)}`);
+console.log(`Labor VAT: €${quote.laborVat.toFixed(2)}`);
+console.log(`Matrl VAT: €${quote.materialVat.toFixed(2)}`);
+console.log(`GRAND TOTAL: €${quote.grandTotal.toFixed(2)}`);
 
 console.log(`\n--- Supplier Breakdown ---`);
 for (const g of groups) {
   const total = g.lines.reduce((s, l) => s + l.totalPrice, 0);
-  console.log(`${g.supplier}: $${total.toFixed(2)} (${g.lines.length} SKUs)`);
+  console.log(`${g.supplier}: €${total.toFixed(2)} (${g.lines.length} SKUs)`);
 }

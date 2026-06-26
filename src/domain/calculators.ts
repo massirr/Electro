@@ -6,7 +6,13 @@ import type {
   QuoteResult,
   SupplierGroup,
   QuoteSettings,
+  JobType,
 } from "./types";
+
+const LABOR_VAT_RATES: Record<JobType, number> = {
+  renovation: 0.06,
+  "new-build": 0.21,
+};
 
 export function calcLaborTotal(items: TakeoffItem[], hourlyRate: number): number {
   const totalHours = items.reduce(
@@ -75,11 +81,30 @@ export function buildQuote(
   const materialTotal = calcMaterialTotal(lineItems);
   const subtotal = Math.round((laborTotal + materialTotal) * 100) / 100;
   const margin = applyMargin(subtotal, settings.marginPercent);
-  const vat = applyVAT(subtotal + margin, settings.vatPercent);
-  const grandTotal =
-    Math.round((subtotal + margin + vat) * 100) / 100;
+  const totalWithMargin = Math.round((subtotal + margin) * 100) / 100;
 
-  return { laborTotal, materialTotal, subtotal, margin, vat, grandTotal, lineItems };
+  // Distribute margin proportionally, then apply separate VAT rates
+  const laborBase = subtotal > 0
+    ? Math.round((totalWithMargin * (laborTotal / subtotal)) * 100) / 100
+    : 0;
+  const materialBase = Math.round((totalWithMargin - laborBase) * 100) / 100;
+
+  const laborVatRate = LABOR_VAT_RATES[settings.jobType];
+  const laborVat = Math.round(laborBase * laborVatRate * 100) / 100;
+  const materialVat = Math.round(materialBase * 0.06 * 100) / 100;
+  const grandTotal = Math.round((totalWithMargin + laborVat + materialVat) * 100) / 100;
+
+  return {
+    jobType: settings.jobType,
+    laborTotal,
+    materialTotal,
+    subtotal,
+    margin,
+    laborVat,
+    materialVat,
+    grandTotal,
+    lineItems,
+  };
 }
 
 export function groupBySupplier(lineItems: LineItem[]): SupplierGroup[] {

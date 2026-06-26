@@ -12,7 +12,7 @@ const TAKEOFF: TakeoffItem[] = [
   { id: "wire-14-2",     name: "14/2 NMD wire (meters)",  quantity: 200, hoursPerUnit: 0.02 },
 ];
 
-const SETTINGS: QuoteSettings = { hourlyRate: 85, vatPercent: 21, marginPercent: 15 };
+const SETTINGS: QuoteSettings = { hourlyRate: 85, jobType: "new-build", marginPercent: 15 };
 
 function makeRequest(body: unknown) {
   return new Request("http://localhost/api/quote", {
@@ -33,7 +33,7 @@ describe("POST /api/quote", () => {
   it("returns 200 with correct grandTotal", async () => {
     const res = await POST(makeRequest({ takeoff: TAKEOFF, settings: SETTINGS }));
     const data: QuoteResult = await res.json();
-    expect(data.grandTotal).toBe(5088.58);
+    expect(data.grandTotal).toBe(4822.87);
   });
 
   it("returns 200 with lineItems array", async () => {

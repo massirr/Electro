@@ -12,7 +12,7 @@ interface TakeoffJSON {
   }>;
   settings: {
     hourly_rate: number;
-    vat_percent: number;
+    job_type: "renovation" | "new-build";
     margin_percent: number;
   };
 }
@@ -37,7 +37,7 @@ export async function loadTakeoff(filePath: string): Promise<TakeoffData> {
 
   const settings: QuoteSettings = {
     hourlyRate: raw.settings.hourly_rate,
-    vatPercent: raw.settings.vat_percent,
+    jobType: raw.settings.job_type,
     marginPercent: raw.settings.margin_percent,
   };
 
