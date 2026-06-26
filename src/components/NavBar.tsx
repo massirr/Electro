@@ -35,7 +35,7 @@ export function NavBar() {
       <button
         type="button"
         onClick={toggle}
-        className="text-xs font-medium px-3 py-1.5 rounded-md border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] transition-colors"
+        className="text-xs font-medium px-3 py-2 min-h-[40px] rounded-md border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] active:opacity-70 transition-colors"
       >
         {theme === "dark" ? "Light mode" : "Dark mode"}
       </button>

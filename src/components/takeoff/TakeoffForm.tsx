@@ -109,7 +109,7 @@ function ItemCombobox({
         aria-label={`Item, row ${rowIndex + 1}`}
         disabled={disabled}
         autoFocus={autoFocus}
-        className="w-full text-left text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md hover:border-[var(--hairline-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full text-left text-sm px-3 py-2 min-h-[44px] sm:min-h-0 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md hover:border-[var(--hairline-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={openDropdown}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -343,7 +343,7 @@ export function TakeoffForm({
     <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-6">
       {/* Left: Takeoff table */}
       <section
-        className="rounded-lg p-6"
+        className="rounded-lg p-4 sm:p-6"
         style={{ background: "var(--surface-1)", border: "1px solid var(--hairline)", boxShadow: "var(--card-shadow)" }}
       >
         <h2 className="text-xs font-semibold tracking-widest uppercase text-[var(--ink-muted)] mb-4">
@@ -448,7 +448,7 @@ export function TakeoffForm({
                       tabIndex={-1}
                       aria-label={`Remove row ${idx + 1}`}
                       onClick={() => removeRow(row.key)}
-                      className="opacity-0 group-hover:opacity-100 text-[#62666d] hover:text-[var(--foreground)] transition-opacity text-base leading-none"
+                      className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-[#62666d] hover:text-[var(--foreground)] transition-opacity text-base leading-none p-1"
                     >
                       ×
                     </button>
@@ -476,7 +476,7 @@ export function TakeoffForm({
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="text-xs font-medium px-4 py-2 rounded-md bg-[var(--accent)] text-white hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="text-sm font-medium px-5 py-3 sm:py-2 rounded-md bg-[var(--accent)] text-white hover:opacity-90 active:opacity-75 transition-opacity disabled:opacity-50 min-h-[44px] sm:min-h-0"
             >
               {saving ? "Saving…" : "Save quote"}
             </button>

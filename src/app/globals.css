@@ -58,5 +58,17 @@ body {
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
+/* Prevent iOS zoom on input focus — browser zooms when font-size < 16px */
+@media (max-width: 767px) {
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+/* Prevent 300ms double-tap delay on interactive elements */
+button, a, [role="option"], [role="combobox"] {
+  touch-action: manipulation;
+}
+
 /* Hide Next.js dev overlay */
 nextjs-portal { display: none !important; }

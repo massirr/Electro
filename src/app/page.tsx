@@ -41,22 +41,22 @@ export default function QuotePage() {
   }, []);
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-10">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
       <header
-        className="mb-10 pl-4"
+        className="mb-6 sm:mb-10 pl-4"
         style={{ borderLeft: "2px solid var(--accent)" }}
       >
         <h1
           className="font-semibold text-[var(--ink)]"
-          style={{ fontSize: "36px", lineHeight: 1.1, letterSpacing: "-0.8px" }}
+          style={{ fontSize: "clamp(24px, 6vw, 36px)", lineHeight: 1.1, letterSpacing: "-0.8px" }}
         >
           Electro
         </h1>
         <p className="text-sm text-[var(--ink-muted)] mt-1">Quote builder</p>
       </header>
 
-      <div className="flex gap-6 items-start">
-        <aside className="w-60 shrink-0">
+      <div className="flex flex-col gap-4 md:flex-row md:gap-6 md:items-start">
+        <aside className="w-full md:w-60 md:shrink-0">
           <QuotesList
             refreshKey={refreshKey}
             onLoad={handleLoad}

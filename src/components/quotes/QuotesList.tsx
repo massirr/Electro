@@ -71,14 +71,14 @@ export function QuotesList({
               <div className="flex gap-1.5">
                 <button
                   onClick={() => onLoad(q.id)}
-                  className="flex-1 text-xs px-2 py-1 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] transition-colors"
+                  className="flex-1 text-xs px-2 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] active:opacity-70 transition-colors"
                 >
                   Load
                 </button>
                 <button
                   onClick={() => handleDelete(q.id)}
                   disabled={deletingId === q.id}
-                  className="text-xs px-2 py-1 rounded border border-[var(--hairline)] text-[#e5533d] hover:border-[#e5533d] transition-colors disabled:opacity-40"
+                  className="text-xs px-3 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] text-[#e5533d] hover:border-[#e5533d] active:opacity-70 transition-colors disabled:opacity-40"
                 >
                   ×
                 </button>
