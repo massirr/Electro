@@ -70,5 +70,18 @@ button, a, [role="option"], [role="combobox"] {
   touch-action: manipulation;
 }
 
+/* ── Print styles ───────────────────────────────────────────────────── */
+@media print {
+  .no-print { display: none !important; }
+
+  body { background: white !important; color: black !important; }
+
+  /* Show only the quote preview panel */
+  main > div > aside { display: none !important; }
+  main > div > div > div:first-child { display: none !important; } /* takeoff left panel */
+
+  @page { margin: 20mm; size: A4; }
+}
+
 /* Hide Next.js dev overlay */
 nextjs-portal { display: none !important; }

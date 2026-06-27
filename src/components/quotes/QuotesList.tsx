@@ -17,10 +17,12 @@ export function QuotesList({
   refreshKey,
   onLoad,
   onDelete,
+  userId,
 }: {
   refreshKey: number;
   onLoad: (id: string) => void;
   onDelete: (id: string) => void;
+  userId?: string;
 }) {
   const [quotes, setQuotes] = useState<SavedQuote[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,14 +30,15 @@ export function QuotesList({
 
   useEffect(() => {
     setLoading(true);
-    fetch("/api/quotes")
+    const url = userId ? `/api/quotes?owner=${encodeURIComponent(userId)}` : "/api/quotes";
+    fetch(url)
       .then((r) => r.json())
       .then((data) => {
         setQuotes(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [refreshKey]);
+  }, [refreshKey, userId]);
 
   async function handleDelete(id: string) {
     setDeletingId(id);

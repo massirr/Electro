@@ -19,11 +19,13 @@ function getDataCache() {
   return _cache;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const owner = req.nextUrl.searchParams.get("owner") ?? "";
   try {
     const records = await pb.collection("projects").getFullList({
       sort: "-created",
       fields: "id,name,projectDate,grandTotal,created",
+      filter: owner ? `owner = "${owner}"` : "",
     });
     return NextResponse.json(records);
   } catch (err) {
@@ -38,6 +40,10 @@ interface SaveBody {
   hourlyRate?: number;
   marginPercent?: number;
   rows?: TakeoffItem[];
+  owner?: string;
+  customerName?: string;
+  customerEmail?: string;
+  customerAddress?: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -48,7 +54,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { name, jobType, hourlyRate, marginPercent, rows } = body;
+  const { name, jobType, hourlyRate, marginPercent, rows, owner, customerName, customerEmail, customerAddress } = body;
 
   if (!name?.trim()) {
     return NextResponse.json({ error: "Project name is required" }, { status: 400 });
@@ -71,6 +77,10 @@ export async function POST(req: NextRequest) {
       hourlyRate,
       marginPercent,
       grandTotal: quote.grandTotal,
+      owner: owner || null,
+      customerName: customerName || "",
+      customerEmail: customerEmail || "",
+      customerAddress: customerAddress || "",
     });
 
     await Promise.all(

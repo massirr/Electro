@@ -23,6 +23,9 @@ interface LoadTarget {
     jobType: JobType;
     hourlyRate: number;
     marginPercent: number;
+    customerName?: string;
+    customerEmail?: string;
+    customerAddress?: string;
   };
   items: Array<{
     externalItemId: string;
@@ -170,9 +173,17 @@ function ItemCombobox({
 export function TakeoffForm({
   loadTarget,
   onSaved,
+  userId,
+  initialHourlyRate = 85,
+  electricianName,
+  electricianBtw,
 }: {
   loadTarget: LoadTarget | null;
   onSaved: () => void;
+  userId?: string;
+  initialHourlyRate?: number;
+  electricianName?: string;
+  electricianBtw?: string;
 }) {
   const [catalog, setCatalog] = useState<CatalogItem[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(true);
@@ -183,8 +194,13 @@ export function TakeoffForm({
   // Quote settings
   const [projectName, setProjectName] = useState("");
   const [jobType, setJobType] = useState<JobType>("new-build");
-  const [hourlyRate] = useState(85);
+  const [hourlyRate] = useState(initialHourlyRate);
   const [marginPercent] = useState(15);
+
+  // Customer info
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerAddress, setCustomerAddress] = useState("");
 
   // Save state
   const [saving, setSaving] = useState(false);
@@ -237,6 +253,9 @@ export function TakeoffForm({
     const { project, items } = loadTarget;
     setProjectName(project.name);
     setJobType(project.jobType);
+    setCustomerName(project.customerName ?? "");
+    setCustomerEmail(project.customerEmail ?? "");
+    setCustomerAddress(project.customerAddress ?? "");
     const newRows = items.map((item) => ({
       key: String(nextKeyRef.current++),
       id: item.externalItemId,
@@ -321,7 +340,17 @@ export function TakeoffForm({
       const res = await fetch("/api/quotes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: projectName.trim(), jobType, hourlyRate, marginPercent, rows: takeoffItems }),
+        body: JSON.stringify({
+          name: projectName.trim(),
+          jobType,
+          hourlyRate,
+          marginPercent,
+          rows: takeoffItems,
+          owner: userId,
+          customerName: customerName.trim(),
+          customerEmail: customerEmail.trim(),
+          customerAddress: customerAddress.trim(),
+        }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -356,6 +385,31 @@ export function TakeoffForm({
           placeholder="Project name…"
           value={projectName}
           onChange={(e) => { setProjectName(e.target.value); setSaveOk(false); }}
+          className="w-full text-sm px-3 py-2 mb-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
+        />
+
+        {/* Customer info */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+          <input
+            type="text"
+            placeholder="Customer name"
+            value={customerName}
+            onChange={(e) => { setCustomerName(e.target.value); setSaveOk(false); }}
+            className="text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
+          />
+          <input
+            type="email"
+            placeholder="Customer email"
+            value={customerEmail}
+            onChange={(e) => { setCustomerEmail(e.target.value); setSaveOk(false); }}
+            className="text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
+          />
+        </div>
+        <input
+          type="text"
+          placeholder="Customer address"
+          value={customerAddress}
+          onChange={(e) => { setCustomerAddress(e.target.value); setSaveOk(false); }}
           className="w-full text-sm px-3 py-2 mb-3 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
         />
 
@@ -496,7 +550,15 @@ export function TakeoffForm({
             <p className="text-xs text-[var(--error)] mb-2">{quoteError}</p>
           )}
           {quote ? (
-            <QuotePreview quote={quote} />
+            <QuotePreview
+              quote={quote}
+              projectName={projectName}
+              customerName={customerName}
+              customerEmail={customerEmail}
+              customerAddress={customerAddress}
+              electricianName={electricianName}
+              electricianBtw={electricianBtw}
+            />
           ) : (
             <div className="flex items-center justify-center h-48">
               <p className="text-sm text-[var(--ink-subtle)]">Add items to see the quote.</p>
