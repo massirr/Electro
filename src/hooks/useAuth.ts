@@ -26,15 +26,14 @@ export function useAuth() {
     return () => { unsub(); };
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const requestOTP = useCallback(async (email: string): Promise<{ otpId: string }> => {
     const pb = getPbClient();
-    await pb.collection("users").authWithPassword(email, password);
+    return pb.collection("users").requestOTP(email);
   }, []);
 
-  const register = useCallback(async (email: string, password: string, name: string) => {
+  const authWithOTP = useCallback(async (otpId: string, code: string): Promise<void> => {
     const pb = getPbClient();
-    await pb.collection("users").create({ email, password, passwordConfirm: password, name });
-    await pb.collection("users").authWithPassword(email, password);
+    await pb.collection("users").authWithOTP(otpId, code);
   }, []);
 
   const logout = useCallback(() => {
@@ -49,5 +48,5 @@ export function useAuth() {
     return updated as AuthUser;
   }, []);
 
-  return { user, loading, login, register, logout, updateProfile };
+  return { user, loading, requestOTP, authWithOTP, logout, updateProfile };
 }

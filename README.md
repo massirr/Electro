@@ -1,69 +1,38 @@
 # Electro
 
-Tool for electricians: Takeoff → Quote → Supplier Orders.
+Takeoff-to-quote tool for Belgian electricians. Enter line items, get a priced quote with labor, materials, VAT, and supplier breakdown.
 
 ---
 
-## MVP Scope
+## Stack
 
-- Manual takeoff entry (no PDF/DWG parsing)
-- Quote calculation (labor + materials + VAT + margin)
-- Product mapping (takeoff items → SKUs via kits)
-- Export supplier orders (CEBO, Rexel) as CSV
-
----
-
-## Status
-
-Planning scaffold complete. Sample data exists, implementation not started.
-
-- Agent workflow: [AGENTS.md](AGENTS.md)
-- Next work queue: [docs/PHASE_01_PLAN.md](docs/PHASE_01_PLAN.md)
-- PocketBase collection plan: [docs/pocketbase-schema.md](docs/pocketbase-schema.md)
+- **Frontend/API** — Next.js (App Router)
+- **Backend** — PocketBase (embedded SQLite)
+- **Runtime** — Bun
 
 ---
 
-## Project Structure
+## Run locally
 
-```text
-.
-├── AGENTS.md
-├── data/
-│   ├── README.md
-│   └── sample-inputs/
-├── docs/
-│   ├── PHASE_01_PLAN.md
-│   ├── pocketbase-schema.md
-│   └── design/
-│       └── Hugues.excalidraw
-├── infra/
-│   └── podman-compose.yml
-├── src/
-└── README.md
+**1. Start PocketBase**
+```bash
+./infra/pocketbase/pocketbase serve --dir ./infra/pocketbase/pb_data
 ```
 
----
-
-## Source Code Layout
-
-Suggested first build layout:
-
-```text
-src/
-  domain/        # core formulas and types
-  io/            # file parsing + CSV export
-  app/           # pipeline/use-cases
-  index.ts       # entrypoint
+**2. Start the app**
+```bash
+bun dev
 ```
 
-Detailed implementation order is in `docs/PHASE_01_PLAN.md`.
+Visit `http://localhost:3000`
 
-## Backend Direction
+---
 
-- Backend runtime: `PocketBase`
-- Auth for MVP: `PocketBase auth`
-- Persistence: PocketBase embedded `SQLite`
-- App server/UI: `Next.js` App Router
+## Domain docs
+
+- [`docs/domain-knowledge.md`](docs/domain-knowledge.md) — Belgian electrician business rules (VAT, catalog, quotes)
+- [`AGENTS.md`](AGENTS.md) — stack conventions and quality gates
+- [`docs/MASTER_PLAN.md`](docs/MASTER_PLAN.md) — implementation plan
 
 ---
 

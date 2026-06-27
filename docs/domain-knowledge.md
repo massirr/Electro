@@ -135,7 +135,30 @@ A Belgian offerte/factuur must include:
 
 ---
 
+## Authentication
+
+**Method: OTP (one-time password) — passwordless.**
+
+No passwords stored or managed. Flow:
+1. User enters email address
+2. PocketBase sends a short numeric code to that email
+3. User enters the code → signed in
+4. First-time users are created automatically (no separate registration step)
+
+This is also called "magic link" or "passwordless email auth." The difference from a true magic link: instead of clicking a URL, the user types a code. Both are equally secure; codes work better on mobile (no switching apps).
+
+### Setup requirement
+
+OTP must be enabled in PocketBase admin UI:
+1. Go to `http://localhost:8090/_/` → Collections → users → Auth
+2. Enable "OTP" toggle
+3. Enable "Create missing users" (allows first login = account creation)
+4. Configure SMTP under Settings → Mail settings (required for emails to send)
+
+For local development: use [Mailpit](https://mailpit.axllent.org/) as a local SMTP catcher — it intercepts emails without sending them, letting you see codes in a web UI.
+
+---
+
 ## Mobile Notes
 
 Tool is used mainly on laptop. Mobile must work but secondary.
-Known issue: selecting items on mobile causes viewport zoom + horizontal scroll — needs responsive layout fix.

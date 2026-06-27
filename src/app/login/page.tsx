@@ -4,13 +4,16 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
+type Step = "email" | "code";
+
 export default function LoginPage() {
-  const { user, loading, login, register } = useAuth();
+  const { user, loading, requestOTP, authWithOTP } = useAuth();
   const router = useRouter();
-  const [mode, setMode] = useState<"login" | "register">("login");
+
+  const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [otpId, setOtpId] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -18,21 +21,32 @@ export default function LoginPage() {
     if (!loading && user) router.push("/");
   }, [user, loading, router]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSendCode(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
     try {
-      if (mode === "login") {
-        await login(email, password);
-      } else {
-        if (!name.trim()) { setError("Name required"); return; }
-        await register(email, password, name.trim());
-      }
+      const { otpId: id } = await requestOTP(email.trim());
+      setOtpId(id);
+      setStep("code");
+    } catch (err) {
+      const msg = (err as { message?: string }).message ?? "Failed to send code";
+      setError(msg.includes("Failed to fetch") ? "Cannot reach PocketBase — is it running?" : msg);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleVerifyCode(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+    try {
+      await authWithOTP(otpId, code.trim());
       router.push("/");
     } catch (err) {
-      const msg = (err as { message?: string }).message ?? "Authentication failed";
-      setError(msg.includes("Failed to fetch") ? "Cannot reach PocketBase — is it running?" : msg);
+      const msg = (err as { message?: string }).message ?? "Invalid code";
+      setError(msg.includes("Failed to fetch") ? "Cannot reach PocketBase — is it running?" : "Invalid or expired code. Try again.");
     } finally {
       setSubmitting(false);
     }
@@ -51,74 +65,77 @@ export default function LoginPage() {
         </div>
 
         <div className="rounded-lg p-6" style={{ background: "var(--surface-1)", border: "1px solid var(--hairline)" }}>
-          <div className="flex gap-1 mb-6">
-            {(["login", "register"] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => { setMode(m); setError(null); }}
-                className={`flex-1 text-xs py-2 rounded border transition-colors ${
-                  mode === m
-                    ? "bg-[var(--accent)] border-[var(--accent)] text-white"
-                    : "border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)]"
-                }`}
-              >
-                {m === "login" ? "Sign in" : "Create account"}
-              </button>
-            ))}
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-3">
-            {mode === "register" && (
+          {step === "email" ? (
+            <form onSubmit={handleSendCode} className="space-y-4">
               <div>
-                <label className="block text-xs text-[var(--ink-muted)] mb-1">Name</label>
+                <label className="block text-xs text-[var(--ink-muted)] mb-1">Email address</label>
                 <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Jan Janssen"
-                  autoComplete="name"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="jan@electro.be"
+                  autoComplete="email"
+                  autoFocus
+                  required
                   className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
                 />
               </div>
-            )}
-            <div>
-              <label className="block text-xs text-[var(--ink-muted)] mb-1">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="jan@electro.be"
-                autoComplete="email"
-                required
-                className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-[var(--ink-muted)] mb-1">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                autoComplete={mode === "login" ? "current-password" : "new-password"}
-                required
-                minLength={8}
-                className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
-              />
-            </div>
 
-            {error && <p className="text-xs text-[var(--error)]">{error}</p>}
+              {error && <p className="text-xs text-[var(--error)]">{error}</p>}
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full text-sm font-medium py-3 rounded-md bg-[var(--accent)] text-white hover:opacity-90 active:opacity-75 disabled:opacity-50 transition-opacity min-h-[44px] mt-2"
-            >
-              {submitting ? "…" : mode === "login" ? "Sign in" : "Create account"}
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full text-sm font-medium py-3 rounded-md bg-[var(--accent)] text-white hover:opacity-90 active:opacity-75 disabled:opacity-50 transition-opacity min-h-[44px]"
+              >
+                {submitting ? "Sending…" : "Send sign-in code"}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyCode} className="space-y-4">
+              <div>
+                <p className="text-xs text-[var(--ink-muted)] mb-3">
+                  Code sent to <span className="text-[var(--ink)]">{email}</span>
+                </p>
+                <label className="block text-xs text-[var(--ink-muted)] mb-1">Sign-in code</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+                  placeholder="123456"
+                  autoComplete="one-time-code"
+                  autoFocus
+                  maxLength={8}
+                  required
+                  className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)] tracking-widest"
+                />
+              </div>
+
+              {error && <p className="text-xs text-[var(--error)]">{error}</p>}
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full text-sm font-medium py-3 rounded-md bg-[var(--accent)] text-white hover:opacity-90 active:opacity-75 disabled:opacity-50 transition-opacity min-h-[44px]"
+              >
+                {submitting ? "Verifying…" : "Sign in"}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setStep("email"); setCode(""); setError(null); }}
+                className="w-full text-xs text-[var(--ink-subtle)] hover:text-[var(--ink)] py-1 transition-colors"
+              >
+                ← Use a different email
+              </button>
+            </form>
+          )}
         </div>
+
+        <p className="text-xs text-center text-[var(--ink-tertiary)] mt-4">
+          No password needed — sign in with your email.
+        </p>
       </div>
     </div>
   );
