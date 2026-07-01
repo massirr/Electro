@@ -28,7 +28,43 @@
 
 ---
 
-## Session — 2026-07-01
+## Session — 2026-07-01 (auth fix + magic link)
+
+**Status:** Magic link auth fully working locally and deployed. One outstanding config task: custom SMTP (see blockers).
+
+### Done
+- Fixed stale `.next` cache causing webpack 500 on `/login`
+- Fixed `handle_new_user` trigger: added `SET search_path = public` — GoTrue's `supabase_auth_admin` role can't resolve `public.profiles` without it, breaking all user creation via admin API
+- Switched from OTP code-entry flow to magic link flow (Supabase's default email only sends a link, not a code)
+- Added `/auth/callback` route — exchanges PKCE code for session, sets cookies correctly on the redirect response
+- Changed `shouldCreateUser: true` + `emailRedirectTo` — open-source users can self-register, magic links redirect to `/auth/callback` dynamically
+- Excluded `/auth/*` from middleware redirect guard
+- Fixed friendly error messages on login page
+- Removed duplicate `<NavBar />` render in `profile/page.tsx` (root layout already renders it)
+- Pushed to main — live at https://electro-quote.vercel.app
+
+### Decisions made
+- Magic link > code entry: Supabase's default email template only shows a link; matching the UI to what's actually sent avoids confusion and requires zero per-deployment email template config
+- `shouldCreateUser: true`: app is open source, anyone deploying should be able to create their own account on first login
+- Auth callback sets cookies on the redirect `response` object directly (not via `cookies()` from `next/headers`) — required for session to carry through the redirect in Next.js route handlers
+
+### Blockers / open questions
+- **⚠️ Set up custom SMTP (Resend) — do this before heavy testing.**
+  Supabase's shared email pool flagged the project for bounced emails (caused by test addresses during debugging). Steps:
+  1. Create account at resend.com, get API key
+  2. Supabase Dashboard → Project Settings → Auth → SMTP Settings → enable custom SMTP
+  3. Host: `smtp.resend.com` · Port: `465` · Username: `resend` · Password: `<Resend API key>`
+  4. Sender: `noreply@yourdomain.com` (or `onboarding@resend.dev` for sandbox)
+
+### Start here next session
+1. **Set up Resend SMTP** (see blockers above) — takes ~5 min
+2. Test full magic link flow on production (https://electro-quote.vercel.app)
+3. Next feature: **supplier order export** — per-supplier CSV download (last unbuilt item from `docs/MASTER_PLAN.md` §8)
+4. Start with `/office-hours` → `/opsx:propose "supplier-order-export"` → `/plan-eng-review`
+
+---
+
+## Session — 2026-07-01 (Supabase migration)
 
 **Status:** Fully migrated from PocketBase to Supabase. Deployed to Vercel at https://electro-quote.vercel.app. OTP auth live with real email delivery via Supabase.
 
