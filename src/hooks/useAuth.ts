@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getPbClient } from "@/lib/pb-client";
-import type { RecordModel } from "pocketbase";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
-export interface AuthUser extends RecordModel {
+export interface AuthUser {
+  id: string;
   email: string;
   name: string;
-  btwNumber?: string;
-  hourlyRate?: number;
+  btwNumber: string;
+  hourlyRate: number;
 }
 
 export function useAuth() {
@@ -16,36 +17,66 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const pb = getPbClient();
-    setUser(pb.authStore.model ? (pb.authStore.model as AuthUser) : null);
-    setLoading(false);
+    const supabase = createClient();
 
-    const unsub = pb.authStore.onChange((_token, model) => {
-      setUser(model ? (model as AuthUser) : null);
+    async function loadUser(supabaseUser: User | null) {
+      if (!supabaseUser) { setUser(null); setLoading(false); return; }
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("name, btw_number, hourly_rate")
+        .eq("id", supabaseUser.id)
+        .single();
+      setUser({
+        id: supabaseUser.id,
+        email: supabaseUser.email ?? "",
+        name: profile?.name ?? "",
+        btwNumber: profile?.btw_number ?? "",
+        hourlyRate: profile?.hourly_rate ?? 85,
+      });
+      setLoading(false);
+    }
+
+    supabase.auth.getUser().then(({ data: { user: u } }) => loadUser(u));
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      loadUser(session?.user ?? null);
     });
-    return () => { unsub(); };
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const requestOTP = useCallback(async (email: string): Promise<{ otpId: string }> => {
-    const pb = getPbClient();
-    return pb.collection("users").requestOTP(email);
+  const requestOTP = useCallback(async (email: string) => {
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: false },
+    });
+    if (error) throw error;
   }, []);
 
-  const authWithOTP = useCallback(async (otpId: string, code: string): Promise<void> => {
-    const pb = getPbClient();
-    await pb.collection("users").authWithOTP(otpId, code);
+  const authWithOTP = useCallback(async (email: string, token: string) => {
+    const supabase = createClient();
+    const { error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
+    if (error) throw error;
   }, []);
 
-  const logout = useCallback(() => {
-    getPbClient().authStore.clear();
+  const logout = useCallback(async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
   }, []);
 
   const updateProfile = useCallback(async (data: { name?: string; btwNumber?: string; hourlyRate?: number }) => {
-    const pb = getPbClient();
-    if (!pb.authStore.model?.id) throw new Error("Not authenticated");
-    const updated = await pb.collection("users").update(pb.authStore.model.id, data);
-    pb.authStore.save(pb.authStore.token, updated);
-    return updated as AuthUser;
+    const supabase = createClient();
+    const { data: { user: u } } = await supabase.auth.getUser();
+    if (!u) throw new Error("Not authenticated");
+    const { error } = await supabase.from("profiles").update({
+      name: data.name,
+      btw_number: data.btwNumber,
+      hourly_rate: data.hourlyRate,
+      updated_at: new Date().toISOString(),
+    }).eq("id", u.id);
+    if (error) throw error;
+    setUser(prev => prev ? { ...prev, ...data, btwNumber: data.btwNumber ?? prev.btwNumber } : null);
   }, []);
 
   return { user, loading, requestOTP, authWithOTP, logout, updateProfile };

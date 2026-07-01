@@ -12,7 +12,6 @@ export default function LoginPage() {
 
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
-  const [otpId, setOtpId] = useState("");
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -26,12 +25,11 @@ export default function LoginPage() {
     setError(null);
     setSubmitting(true);
     try {
-      const { otpId: id } = await requestOTP(email.trim());
-      setOtpId(id);
+      await requestOTP(email.trim());
       setStep("code");
     } catch (err) {
       const msg = (err as { message?: string }).message ?? "Failed to send code";
-      setError(msg.includes("Failed to fetch") ? "Cannot reach PocketBase — is it running?" : msg);
+      setError(msg.toLowerCase().includes("not found") ? "No account with that email." : msg);
     } finally {
       setSubmitting(false);
     }
@@ -42,11 +40,15 @@ export default function LoginPage() {
     setError(null);
     setSubmitting(true);
     try {
-      await authWithOTP(otpId, code.trim());
+      await authWithOTP(email.trim(), code.trim());
       router.push("/");
     } catch (err) {
       const msg = (err as { message?: string }).message ?? "Invalid code";
-      setError(msg.includes("Failed to fetch") ? "Cannot reach PocketBase — is it running?" : "Invalid or expired code. Try again.");
+      setError(
+        msg.toLowerCase().includes("expired") || msg.toLowerCase().includes("invalid")
+          ? "Invalid or expired code. Try again."
+          : msg
+      );
     } finally {
       setSubmitting(false);
     }
@@ -80,9 +82,7 @@ export default function LoginPage() {
                   className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
                 />
               </div>
-
               {error && <p className="text-xs text-[var(--error)]">{error}</p>}
-
               <button
                 type="submit"
                 disabled={submitting}
@@ -111,9 +111,7 @@ export default function LoginPage() {
                   className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)] tracking-widest"
                 />
               </div>
-
               {error && <p className="text-xs text-[var(--error)]">{error}</p>}
-
               <button
                 type="submit"
                 disabled={submitting}
@@ -121,7 +119,6 @@ export default function LoginPage() {
               >
                 {submitting ? "Verifying…" : "Sign in"}
               </button>
-
               <button
                 type="button"
                 onClick={() => { setStep("email"); setCode(""); setError(null); }}

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { pb } from "@/lib/pb";
+import { createClient } from "@/lib/supabase/server";
 import type { JobType, TakeoffItem } from "@/domain/types";
-import { buildQuote, expandKits, calcLaborTotal, calcMaterialTotal, applyMargin } from "@/domain/calculators";
+import { buildQuote } from "@/domain/calculators";
 import { resolve } from "path";
 import { loadCatalog } from "@/io/load-catalog";
 import { loadKits } from "@/io/load-kits";
@@ -19,19 +19,29 @@ function getDataCache() {
   return _cache;
 }
 
-export async function GET(req: NextRequest) {
-  const owner = req.nextUrl.searchParams.get("owner") ?? "";
-  try {
-    const records = await pb.collection("projects").getFullList({
-      sort: "-created",
-      fields: "id,name,projectDate,grandTotal,created",
-      filter: owner ? `owner = "${owner}"` : "",
-    });
-    return NextResponse.json(records);
-  } catch (err) {
-    console.error("[GET /api/quotes]", err);
+export async function GET() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { data, error } = await supabase
+    .from("projects")
+    .select("id, name, project_date, grand_total, created_at")
+    .eq("owner", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("[GET /api/quotes]", error);
     return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
   }
+
+  return NextResponse.json(data.map(r => ({
+    id: r.id,
+    name: r.name,
+    projectDate: r.project_date,
+    grandTotal: r.grand_total,
+    created: r.created_at,
+  })));
 }
 
 interface SaveBody {
@@ -40,60 +50,69 @@ interface SaveBody {
   hourlyRate?: number;
   marginPercent?: number;
   rows?: TakeoffItem[];
-  owner?: string;
   customerName?: string;
   customerEmail?: string;
   customerAddress?: string;
 }
 
 export async function POST(req: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   let body: SaveBody;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
+  try { body = await req.json(); }
+  catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
 
-  const { name, jobType, hourlyRate, marginPercent, rows, owner, customerName, customerEmail, customerAddress } = body;
+  const { name, jobType, hourlyRate, marginPercent, rows, customerName, customerEmail, customerAddress } = body;
 
-  if (!name?.trim()) {
-    return NextResponse.json({ error: "Project name is required" }, { status: 400 });
-  }
-  if (!jobType || (jobType !== "renovation" && jobType !== "new-build")) {
+  if (!name?.trim()) return NextResponse.json({ error: "Project name is required" }, { status: 400 });
+  if (!jobType || (jobType !== "renovation" && jobType !== "new-build"))
     return NextResponse.json({ error: "jobType must be renovation or new-build" }, { status: 400 });
-  }
-  if (!hourlyRate || !marginPercent || !Array.isArray(rows) || rows.length === 0) {
+  if (!hourlyRate || !marginPercent || !Array.isArray(rows) || rows.length === 0)
     return NextResponse.json({ error: "hourlyRate, marginPercent, and rows are required" }, { status: 400 });
-  }
 
   try {
     const [catalog, kits] = await getDataCache();
     const quote = buildQuote(rows, kits, catalog, { hourlyRate, jobType, marginPercent });
 
-    const project = await pb.collection("projects").create({
-      name: name.trim(),
-      projectDate: new Date().toISOString().slice(0, 10),
-      jobType,
-      hourlyRate,
-      marginPercent,
-      grandTotal: quote.grandTotal,
-      owner: owner || null,
-      customerName: customerName || "",
-      customerEmail: customerEmail || "",
-      customerAddress: customerAddress || "",
-    });
+    const { data: project, error: projError } = await supabase
+      .from("projects")
+      .insert({
+        name: name.trim(),
+        project_date: new Date().toISOString().slice(0, 10),
+        job_type: jobType,
+        hourly_rate: hourlyRate,
+        margin_percent: marginPercent,
+        grand_total: quote.grandTotal,
+        owner: user.id,
+        customer_name: customerName ?? "",
+        customer_email: customerEmail ?? "",
+        customer_address: customerAddress ?? "",
+      })
+      .select("id, name")
+      .single();
 
-    await Promise.all(
-      rows.map((row) =>
-        pb.collection("takeoff_items").create({
-          project: project.id,
-          externalItemId: row.id,
-          name: row.name,
-          quantity: row.quantity,
-          hoursPerUnit: row.hoursPerUnit,
-        })
-      )
+    if (projError || !project) {
+      console.error("[POST /api/quotes] project insert", projError);
+      return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
+    }
+
+    const { error: itemsError } = await supabase.from("takeoff_items").insert(
+      rows.map(row => ({
+        project_id: project.id,
+        external_item_id: row.id,
+        name: row.name,
+        quantity: row.quantity,
+        hours_per_unit: row.hoursPerUnit,
+      }))
     );
+
+    if (itemsError) {
+      console.error("[POST /api/quotes] items insert", itemsError);
+      await supabase.from("projects").delete().eq("id", project.id);
+      return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
+    }
 
     return NextResponse.json({ id: project.id, name: project.name }, { status: 201 });
   } catch (err) {
