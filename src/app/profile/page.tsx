@@ -13,6 +13,8 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) { router.push("/login"); return; }
@@ -45,6 +47,21 @@ export default function ProfilePage() {
   function handleLogout() {
     logout();
     router.push("/login");
+  }
+
+  async function handleDeleteAccount() {
+    if (!deleteConfirm) { setDeleteConfirm(true); return; }
+    setDeleting(true);
+    const res = await fetch("/api/account", { method: "DELETE" });
+    if (res.ok) {
+      await logout();
+      router.push("/login");
+    } else {
+      const err = await res.json().catch(() => ({}));
+      setError((err as { error?: string }).error ?? "Delete failed");
+      setDeleting(false);
+      setDeleteConfirm(false);
+    }
   }
 
   if (loading || !user) return null;
@@ -109,13 +126,27 @@ export default function ProfilePage() {
           </form>
         </div>
 
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="mt-6 text-sm text-[var(--ink-subtle)] hover:text-[var(--ink)] transition-colors"
-        >
-          Sign out
-        </button>
+        <div className="mt-6 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="text-sm text-[var(--ink-subtle)] hover:text-[var(--ink)] transition-colors"
+          >
+            Sign out
+          </button>
+          <button
+            type="button"
+            onClick={handleDeleteAccount}
+            disabled={deleting}
+            className={`text-xs transition-colors disabled:opacity-50 ${
+              deleteConfirm
+                ? "text-[var(--error)] font-medium"
+                : "text-[var(--ink-tertiary)] hover:text-[var(--error)]"
+            }`}
+          >
+            {deleting ? "Deleting…" : deleteConfirm ? "Tap again to confirm" : "Delete account"}
+          </button>
+        </div>
       </main>
     </>
   );

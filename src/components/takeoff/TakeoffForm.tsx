@@ -527,8 +527,31 @@ export function TakeoffForm({
               electricianBtw={electricianBtw}
             />
           ) : (
-            <div className="flex items-center justify-center h-48">
-              <p className="text-sm text-[var(--ink-subtle)]">Add items to see the quote.</p>
+            <div className="flex flex-col justify-center h-full min-h-[220px] gap-6 py-6">
+              <div>
+                <p className="text-sm font-semibold text-[var(--ink)] mb-1">Your quote will appear here</p>
+                <p className="text-xs text-[var(--ink-subtle)]">Add items on the left to generate a full breakdown.</p>
+              </div>
+              <ol className="space-y-3">
+                {[
+                  { n: "1", label: "Pick an item", detail: "Click the dropdown and start typing — e.g. \"outlet\" or \"breaker\"" },
+                  { n: "2", label: "Enter quantity", detail: "How many of that item does this job need?" },
+                  { n: "3", label: "Save the quote", detail: "A full breakdown with labour, materials & VAT is ready to print or email" },
+                ].map(({ n, label, detail }) => (
+                  <li key={n} className="flex gap-3">
+                    <span
+                      className="flex-shrink-0 flex items-center justify-center rounded-full text-white font-semibold text-[10px] mt-0.5"
+                      style={{ width: "20px", height: "20px", background: "var(--accent)", opacity: 0.85 }}
+                    >
+                      {n}
+                    </span>
+                    <div>
+                      <p className="text-xs font-medium text-[var(--ink-muted)]">{label}</p>
+                      <p className="text-xs text-[var(--ink-subtle)]">{detail}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </div>
           )}
         </div>

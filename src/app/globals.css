@@ -56,6 +56,8 @@ body {
   background-color: var(--canvas);
   color: var(--ink);
   transition: background-color 0.15s ease, color 0.15s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Prevent iOS zoom on input focus — browser zooms when font-size < 16px */
