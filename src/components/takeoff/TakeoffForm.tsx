@@ -317,17 +317,6 @@ export function TakeoffForm({
     updateRow(rowKey, { quantity: parseFloat(val) || 0 });
   }
 
-  function handleHuChange(rowKey: string, val: string) {
-    updateRow(rowKey, { hoursPerUnit: parseFloat(val) || 0, isDefault: false });
-  }
-
-  function handleHuKeyDown(e: React.KeyboardEvent, rowKey: string) {
-    if (e.key === "Enter") {
-      const isLast = rows[rows.length - 1].key === rowKey;
-      if (isLast) addRow();
-    }
-  }
-
   // ── Save ─────────────────────────────────────────────────────────────────────
 
   async function handleSave() {
@@ -436,14 +425,12 @@ export function TakeoffForm({
             <tr className="border-b border-[var(--border)]">
               <th className="py-2 text-left font-medium text-[var(--ink-muted)]">Item</th>
               <th className="py-2 text-right font-medium text-[var(--ink-muted)] w-16">Qty</th>
-              <th className="py-2 text-right font-medium text-[var(--ink-muted)] w-16">h/u</th>
               <th className="w-8" />
             </tr>
           </thead>
           <tbody>
             {rows.map((row, idx) => {
               const qtyInputId = `${row.key}-qty`;
-              const huInputId = `${row.key}-hu`;
               return (
                 <tr key={row.key} className="group border-b border-[var(--border)]">
                   <td className="py-1.5 pr-2">
@@ -472,28 +459,8 @@ export function TakeoffForm({
                       value={row.id ? row.quantity || "" : ""}
                       placeholder={row.id ? "" : "—"}
                       onChange={(e) => handleQtyChange(row.key, e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter" && rows[rows.length - 1].key === row.key) addRow(); }}
                       className="w-full text-right text-sm px-2 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 focus:border-[var(--hairline-strong)] transition-colors disabled:opacity-50 [appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden tabular-nums"
-                    />
-                  </td>
-                  <td className="py-1.5 px-1 w-16">
-                    <input
-                      id={huInputId}
-                      ref={(el) => {
-                        if (el) inputRefs.current.set(huInputId, el);
-                        else inputRefs.current.delete(huInputId);
-                      }}
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      aria-label="Hours per unit"
-                      disabled={!row.id}
-                      value={row.id ? row.hoursPerUnit || "" : ""}
-                      placeholder={row.id ? "" : "—"}
-                      onChange={(e) => handleHuChange(row.key, e.target.value)}
-                      onKeyDown={(e) => handleHuKeyDown(e, row.key)}
-                      className={`w-full text-right text-sm px-2 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 focus:border-[var(--hairline-strong)] transition-colors disabled:opacity-50 [appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden tabular-nums ${
-                        row.isDefault ? "text-[var(--ink-tertiary)]" : "text-[var(--ink)]"
-                      }`}
                     />
                   </td>
                   <td className="py-1.5 w-8 text-center">

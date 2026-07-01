@@ -17,16 +17,19 @@ export function QuotesList({
   refreshKey,
   onLoad,
   onDelete,
+  onDuplicate,
   userId,
 }: {
   refreshKey: number;
   onLoad: (id: string) => void;
   onDelete: (id: string) => void;
+  onDuplicate: (id: string) => void;
   userId?: string;
 }) {
   const [quotes, setQuotes] = useState<SavedQuote[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -43,6 +46,13 @@ export function QuotesList({
   async function handleDelete(id: string) {
     setDeletingId(id);
     onDelete(id);
+  }
+
+  async function handleDuplicate(id: string) {
+    setDuplicatingId(id);
+    await fetch(`/api/quotes/${id}/duplicate`, { method: "POST" });
+    setDuplicatingId(null);
+    onDuplicate(id);
   }
 
   return (
@@ -77,6 +87,14 @@ export function QuotesList({
                   className="flex-1 text-xs px-2 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] active:opacity-70 transition-colors"
                 >
                   Load
+                </button>
+                <button
+                  onClick={() => handleDuplicate(q.id)}
+                  disabled={duplicatingId === q.id}
+                  title="Duplicate"
+                  className="text-xs px-3 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] active:opacity-70 transition-colors disabled:opacity-40"
+                >
+                  ⧉
                 </button>
                 <button
                   onClick={() => handleDelete(q.id)}

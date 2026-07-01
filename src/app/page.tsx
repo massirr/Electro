@@ -47,6 +47,10 @@ export default function QuotePage() {
     setRefreshKey((k) => k + 1);
   }, []);
 
+  const handleDuplicate = useCallback(() => {
+    setRefreshKey((k) => k + 1);
+  }, []);
+
   const handleSaved = useCallback(() => {
     setRefreshKey((k) => k + 1);
   }, []);
@@ -76,6 +80,7 @@ export default function QuotePage() {
             refreshKey={refreshKey}
             onLoad={handleLoad}
             onDelete={handleDelete}
+            onDuplicate={handleDuplicate}
             userId={user.id}
           />
         </aside>

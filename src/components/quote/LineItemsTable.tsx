@@ -14,14 +14,12 @@ export function LineItemsTable({ items }: { items: LineItem[] }) {
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="border-b border-[var(--hairline)] print:border-gray-200">
-            {["SKU", "Name", "Supplier", "Qty", "Unit", "Total"].map((h) => (
-              <th
-                key={h}
-                className="py-2 px-1 print:py-1 text-left font-medium text-[var(--ink-muted)] print:text-gray-600 first:pl-0 last:pr-0 last:text-right"
-              >
-                {h}
-              </th>
-            ))}
+            <th className="py-2 px-1 print:py-1 pl-0 text-left font-medium text-[var(--ink-muted)] print:text-gray-600">SKU</th>
+            <th className="py-2 px-1 print:py-1 text-left font-medium text-[var(--ink-muted)] print:text-gray-600">Name</th>
+            <th className="py-2 px-1 print:py-1 text-left font-medium text-[var(--ink-muted)] print:text-gray-600">Supplier</th>
+            <th className="py-2 px-1 print:py-1 text-left font-medium text-[var(--ink-muted)] print:text-gray-600">Qty</th>
+            <th className="py-2 px-1 print:py-1 text-left font-medium text-[var(--ink-muted)] print:hidden">Unit</th>
+            <th className="py-2 px-1 print:py-1 pr-0 text-right font-medium text-[var(--ink-muted)] print:text-gray-600">Total</th>
           </tr>
         </thead>
         <tbody>
@@ -31,7 +29,7 @@ export function LineItemsTable({ items }: { items: LineItem[] }) {
               <td className="py-2 px-1 print:py-1 text-[var(--ink)] print:text-black">{li.name}</td>
               <td className="py-2 px-1 print:py-1 text-[var(--ink-muted)] print:text-gray-600">{li.supplier}</td>
               <td className="py-2 px-1 print:py-1 tabular-nums print:text-black">{li.quantity}</td>
-              <td className="py-2 px-1 print:py-1 tabular-nums print:text-black">{fmt(li.unitPrice)}</td>
+              <td className="py-2 px-1 print:py-1 tabular-nums print:hidden">{fmt(li.unitPrice)}</td>
               <td className="py-2 px-1 print:py-1 pr-0 text-right tabular-nums print:text-black">{fmt(li.totalPrice)}</td>
             </tr>
           ))}
