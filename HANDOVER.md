@@ -28,6 +28,35 @@
 
 ---
 
+## Session — 2026-07-01 (Hugues features: hours-to-catalog, hide-cost-pdf, CSV export, duplication)
+
+**Status:** All 4 features from Hugues customer feedback shipped and deployed to main.
+
+### Done
+- Created OpenSpec proposals for all 4 features in `openspec/changes/`
+- Removed `h/u` column from TakeoffForm — hours now flow silently from catalog `defaultHu`, Enter key moved to Qty input
+- Hidden unit price column from print/PDF (`print:hidden` on Unit header + cells in LineItemsTable)
+- Added "Export CSV" button to SupplierBreakdown — client-side, no API, downloads `supplier-order.csv`
+- Added quote duplication: `POST /api/quotes/[id]/duplicate` API route + ⧉ button in QuotesList
+- Build passes (0 TS errors), committed and pushed to main → Vercel auto-deploys
+
+### Decisions made
+- All 4 specs created first, then implemented one by one (simplest→most code): hide-cost-pdf → hours-to-catalog → supplier-export → duplication
+- Duplication clears customer fields (name/email/address) on the copy — ready for a new customer
+- CSV export is single file with Supplier column (not per-supplier files) — one click, filter in Excel
+
+### Blockers / open questions
+- None. All Hugues feedback addressed.
+- Optional next: real Belgian supplier prices (Rexel/CEBO catalog) — `domain-knowledge.md` notes this as future scope
+
+### Start here next session
+1. All features from Hugues demo are shipped
+2. Optional: `/investigate` any bugs found during manual testing
+3. Optional: catalog management UI (add/edit items, set default hours) — if Hugues requests it
+4. Optional: Resend SMTP setup (verify `irakozedarlo.be` at resend.com/domains)
+
+---
+
 ## Session — 2026-07-01 (SMTP, print, mobile nav, Playwright)
 
 **Status:** Auth fully working on production via Supabase built-in email. Print PDF works (single page for short quotes). Mobile nav shows profile. Login flow verified with Playwright.
