@@ -25,7 +25,8 @@ export default function LoginPage() {
       await requestOTP(email.trim());
       setSent(true);
     } catch (err) {
-      setError((err as { message?: string }).message ?? "Failed to send link");
+      const msg = (err as { message?: string }).message;
+      setError(msg && msg !== "{}" ? msg : "Failed to send link. Please try again.");
     } finally {
       setSubmitting(false);
     }
