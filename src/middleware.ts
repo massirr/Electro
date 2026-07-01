@@ -21,6 +21,14 @@ export async function middleware(request: NextRequest) {
     }
   );
 
+  // Forward auth codes to /auth/callback regardless of which path Supabase redirected to
+  const code = request.nextUrl.searchParams.get("code");
+  if (code && !request.nextUrl.pathname.startsWith("/auth")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/callback";
+    return NextResponse.redirect(url);
+  }
+
   // Do not add logic between createServerClient and getUser — required by @supabase/ssr
   const { data: { user } } = await supabase.auth.getUser();
 
