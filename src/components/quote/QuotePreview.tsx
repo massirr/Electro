@@ -48,9 +48,9 @@ export function QuotePreview({
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 print:space-y-4">
       {/* Print header — hidden on screen, shown when printing */}
-      <div className="hidden print:block mb-8 pb-6 border-b border-gray-300">
+      <div className="hidden print:block mb-4 pb-4 border-b border-gray-300">
         <div className="flex justify-between items-start mb-6">
           <div>
             <div className="text-xl font-bold text-black">{electricianName || "Electro"}</div>
@@ -85,11 +85,11 @@ export function QuotePreview({
       {/* Summary totals */}
       <section>
         <SectionLabel>Quote Summary</SectionLabel>
-        <div className="bg-[var(--surface-2)] rounded-md p-5 space-y-0 print:bg-white print:border print:border-gray-200" style={{ border: "1px solid var(--hairline)" }}>
+        <div className="bg-[var(--surface-2)] rounded-md p-5 print:p-3 space-y-0 print:bg-white print:border print:border-gray-200" style={{ border: "1px solid var(--hairline)" }}>
           {summaryRows.map(([label, value]) => (
             <div
               key={label}
-              className="flex justify-between py-2 text-sm border-b border-[var(--hairline)] print:border-gray-200"
+              className="flex justify-between py-2 print:py-1 text-sm border-b border-[var(--hairline)] print:border-gray-200"
             >
               <span className="text-[var(--ink-muted)] print:text-gray-600">{label}</span>
               <span className="tabular-nums text-[var(--ink)] print:text-black">{fmt(value)}</span>

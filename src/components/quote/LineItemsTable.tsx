@@ -10,14 +10,14 @@ export function LineItemsTable({ items }: { items: LineItem[] }) {
   );
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto print:overflow-visible">
       <table className="w-full text-sm border-collapse">
         <thead>
-          <tr className="border-b border-[var(--hairline)]">
+          <tr className="border-b border-[var(--hairline)] print:border-gray-200">
             {["SKU", "Name", "Supplier", "Qty", "Unit", "Total"].map((h) => (
               <th
                 key={h}
-                className="py-2 px-1 text-left font-medium text-[var(--ink-muted)] first:pl-0 last:pr-0 last:text-right"
+                className="py-2 px-1 print:py-1 text-left font-medium text-[var(--ink-muted)] print:text-gray-600 first:pl-0 last:pr-0 last:text-right"
               >
                 {h}
               </th>
@@ -26,13 +26,13 @@ export function LineItemsTable({ items }: { items: LineItem[] }) {
         </thead>
         <tbody>
           {sorted.map((li) => (
-            <tr key={li.sku} className="border-b border-[var(--hairline)]">
-              <td className="py-2 px-1 pl-0 font-mono text-xs text-[var(--ink-subtle)]">{li.sku}</td>
-              <td className="py-2 px-1 text-[var(--ink)]">{li.name}</td>
-              <td className="py-2 px-1 text-[var(--ink-muted)]">{li.supplier}</td>
-              <td className="py-2 px-1 tabular-nums">{li.quantity}</td>
-              <td className="py-2 px-1 tabular-nums">{fmt(li.unitPrice)}</td>
-              <td className="py-2 px-1 pr-0 text-right tabular-nums">{fmt(li.totalPrice)}</td>
+            <tr key={li.sku} className="border-b border-[var(--hairline)] print:border-gray-200 print:break-inside-avoid">
+              <td className="py-2 px-1 print:py-1 pl-0 font-mono text-xs text-[var(--ink-subtle)] print:text-gray-500">{li.sku}</td>
+              <td className="py-2 px-1 print:py-1 text-[var(--ink)] print:text-black">{li.name}</td>
+              <td className="py-2 px-1 print:py-1 text-[var(--ink-muted)] print:text-gray-600">{li.supplier}</td>
+              <td className="py-2 px-1 print:py-1 tabular-nums print:text-black">{li.quantity}</td>
+              <td className="py-2 px-1 print:py-1 tabular-nums print:text-black">{fmt(li.unitPrice)}</td>
+              <td className="py-2 px-1 print:py-1 pr-0 text-right tabular-nums print:text-black">{fmt(li.totalPrice)}</td>
             </tr>
           ))}
         </tbody>
