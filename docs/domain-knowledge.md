@@ -135,6 +135,36 @@ A Belgian offerte/factuur must include:
 
 ---
 
+## Customer Feedback — Hugues (2026-07-01)
+
+Validated in a live demo session. Key insights that change how the tool should work:
+
+### "Quantity only" — the core UX principle
+The electrician's job is to know what they need and how many. Everything else (price, installation time, supplier) should already be in the system. The only input per item should be **quantity**.
+
+This means:
+- **Installation hours per item must be pre-configured in the catalog**, not entered manually per row. A 3-way switch always takes ~0.35h to install — the electrician should not have to remember or type this.
+- **Prices come from the catalog**, not looked up on supplier websites. The electrician should never leave the app to find a price.
+
+### Hiding cost prices from the client
+"People should not go to the sites for prices." The client-facing quote (PDF) should show the **margin-included final price**, not the underlying supplier cost. If the client sees €0.95/unit for a box, they'll Google it and question the margin.
+- Client PDF: show totals and Grand Total — **no unit cost prices**
+- Internal view (on screen): can show full breakdown
+
+### Quote duplication
+Electricians reuse quotes. A renovation in house A is often 80% the same as house B. They need to:
+1. Duplicate an existing quote
+2. Open the copy and adjust quantities or swap a few items
+3. Save as a new quote for the new customer
+
+### Supplier inventory mental model
+The electrician thinks of items as "things I pick from the supplier's shelf." When they design a job, they already know what they'll order — they're not pricing from scratch, they're selecting from a known set of items and entering how many they need. This reinforces the catalog-driven, quantity-only approach.
+
+### Real supplier prices (future)
+Ideal state: prices automatically sourced from Belgian electrical suppliers (Rexel, CEBO, etc.) so the catalog stays current without manual updates. Not in scope now, but the data model should not prevent it.
+
+---
+
 ## Authentication
 
 **Method: OTP (one-time password) — passwordless.**
