@@ -35,6 +35,14 @@ export function NavBar() {
       <div className="flex items-center gap-2">
         {user && (
           <Link
+            href="/catalog"
+            className="text-xs text-[var(--ink-subtle)] hover:text-[var(--ink)] transition-colors px-2 py-1"
+          >
+            Catalog
+          </Link>
+        )}
+        {user && (
+          <Link
             href="/profile"
             className="text-xs text-[var(--ink-subtle)] hover:text-[var(--ink)] transition-colors px-2 py-1 max-w-[120px] sm:max-w-none truncate"
           >
