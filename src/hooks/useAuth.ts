@@ -49,14 +49,11 @@ export function useAuth() {
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { shouldCreateUser: false },
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
-    if (error) throw error;
-  }, []);
-
-  const authWithOTP = useCallback(async (email: string, token: string) => {
-    const supabase = createClient();
-    const { error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
     if (error) throw error;
   }, []);
 
@@ -79,5 +76,5 @@ export function useAuth() {
     setUser(prev => prev ? { ...prev, ...data, btwNumber: data.btwNumber ?? prev.btwNumber } : null);
   }, []);
 
-  return { user, loading, requestOTP, authWithOTP, logout, updateProfile };
+  return { user, loading, requestOTP, logout, updateProfile };
 }

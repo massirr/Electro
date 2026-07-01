@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { NavBar } from "@/components/NavBar";
 
 export default function ProfilePage() {
   const { user, loading, updateProfile, logout } = useAuth();
@@ -52,7 +51,6 @@ export default function ProfilePage() {
 
   return (
     <>
-      <NavBar />
       <main className="max-w-lg mx-auto px-4 py-10">
         <header className="mb-8 pl-4" style={{ borderLeft: "2px solid var(--accent)" }}>
           <h1 className="font-semibold text-[var(--ink)]" style={{ fontSize: "24px", letterSpacing: "-0.4px" }}>

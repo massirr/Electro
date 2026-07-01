@@ -4,15 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
-type Step = "email" | "code";
-
 export default function LoginPage() {
-  const { user, loading, requestOTP, authWithOTP } = useAuth();
+  const { user, loading, requestOTP } = useAuth();
   const router = useRouter();
 
-  const [step, setStep] = useState<Step>("email");
+  const [sent, setSent] = useState(false);
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -20,35 +17,15 @@ export default function LoginPage() {
     if (!loading && user) router.push("/");
   }, [user, loading, router]);
 
-  async function handleSendCode(e: React.FormEvent) {
+  async function handleSend(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
     try {
       await requestOTP(email.trim());
-      setStep("code");
+      setSent(true);
     } catch (err) {
-      const msg = (err as { message?: string }).message ?? "Failed to send code";
-      setError(msg.toLowerCase().includes("not found") ? "No account with that email." : msg);
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  async function handleVerifyCode(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setSubmitting(true);
-    try {
-      await authWithOTP(email.trim(), code.trim());
-      router.push("/");
-    } catch (err) {
-      const msg = (err as { message?: string }).message ?? "Invalid code";
-      setError(
-        msg.toLowerCase().includes("expired") || msg.toLowerCase().includes("invalid")
-          ? "Invalid or expired code. Try again."
-          : msg
-      );
+      setError((err as { message?: string }).message ?? "Failed to send link");
     } finally {
       setSubmitting(false);
     }
@@ -67,8 +44,8 @@ export default function LoginPage() {
         </div>
 
         <div className="rounded-lg p-6" style={{ background: "var(--surface-1)", border: "1px solid var(--hairline)" }}>
-          {step === "email" ? (
-            <form onSubmit={handleSendCode} className="space-y-4">
+          {!sent ? (
+            <form onSubmit={handleSend} className="space-y-4">
               <div>
                 <label className="block text-xs text-[var(--ink-muted)] mb-1">Email address</label>
                 <input
@@ -88,45 +65,26 @@ export default function LoginPage() {
                 disabled={submitting}
                 className="w-full text-sm font-medium py-3 rounded-md bg-[var(--accent)] text-white hover:opacity-90 active:opacity-75 disabled:opacity-50 transition-opacity min-h-[44px]"
               >
-                {submitting ? "Sending…" : "Send sign-in code"}
+                {submitting ? "Sending…" : "Send sign-in link"}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleVerifyCode} className="space-y-4">
-              <div>
-                <p className="text-xs text-[var(--ink-muted)] mb-3">
-                  Code sent to <span className="text-[var(--ink)]">{email}</span>
-                </p>
-                <label className="block text-xs text-[var(--ink-muted)] mb-1">Sign-in code</label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-                  placeholder="123456"
-                  autoComplete="one-time-code"
-                  autoFocus
-                  maxLength={8}
-                  required
-                  className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)] tracking-widest"
-                />
-              </div>
-              {error && <p className="text-xs text-[var(--error)]">{error}</p>}
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full text-sm font-medium py-3 rounded-md bg-[var(--accent)] text-white hover:opacity-90 active:opacity-75 disabled:opacity-50 transition-opacity min-h-[44px]"
-              >
-                {submitting ? "Verifying…" : "Sign in"}
-              </button>
+            <div className="space-y-4">
+              <p className="text-sm text-[var(--ink)]">
+                Check your inbox — we sent a sign-in link to{" "}
+                <span className="font-medium">{email}</span>.
+              </p>
+              <p className="text-xs text-[var(--ink-muted)]">
+                Click the link in the email to sign in. It expires in 1 hour.
+              </p>
               <button
                 type="button"
-                onClick={() => { setStep("email"); setCode(""); setError(null); }}
+                onClick={() => { setSent(false); setEmail(""); setError(null); }}
                 className="w-full text-xs text-[var(--ink-subtle)] hover:text-[var(--ink)] py-1 transition-colors"
               >
                 ← Use a different email
               </button>
-            </form>
+            </div>
           )}
         </div>
 
