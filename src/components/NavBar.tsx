@@ -36,7 +36,7 @@ export function NavBar() {
         {user && (
           <Link
             href="/profile"
-            className="text-xs text-[var(--ink-subtle)] hover:text-[var(--ink)] transition-colors px-2 py-1 hidden sm:block"
+            className="text-xs text-[var(--ink-subtle)] hover:text-[var(--ink)] transition-colors px-2 py-1 max-w-[120px] sm:max-w-none truncate"
           >
             {user.name || user.email}
           </Link>
