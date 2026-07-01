@@ -233,14 +233,16 @@ otp_length = 6
 # Number of seconds before the email OTP expires (defaults to 1 hour).
 otp_expiry = 3600
 
+# Using Supabase built-in email (sufficient for low volume)
+# To add Resend SMTP: verify a domain at resend.com/domains, then set enabled = true
 [auth.email.smtp]
-enabled = true
-host = "smtp.resend.com"
-port = 587
-user = "resend"
-pass = "env(RESEND_API_KEY)"
-admin_email = "noreply@irakozedarlo.be"
-sender_name = "Electro"
+enabled = false
+host = ""
+port = 0
+user = ""
+pass = ""
+admin_email = ""
+sender_name = ""
 
 # Uncomment to customize email template
 # [auth.email.template.invite]
