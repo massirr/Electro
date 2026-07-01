@@ -28,6 +28,35 @@
 
 ---
 
+## Session — 2026-07-01 (print + mobile nav + auth redirect)
+
+**Status:** Auth working on production, print PDF working (single page for short quotes), mobile nav shows profile link. One remaining blocker: Resend SMTP for real email delivery.
+
+### Done
+- Fixed magic link redirect: middleware now forwards any `?code=` param to `/auth/callback` regardless of which path Supabase lands on (Supabase always strips the path from `redirect_to` and uses bare `site_url`)
+- Fixed print blank page: the CSS selector `main > div > div > div:first-child` was targeting TakeoffForm's root grid div (hiding both columns). Added `no-print` directly on the left `<section>` inside TakeoffForm, removed the fragile selector from globals.css
+- Fixed print spilling to page 2: tightened spacing with `print:space-y-4`, `print:p-3`, `print:py-1` on summary card and rows; `print:overflow-visible` on LineItemsTable (overflow-x-auto blocked print pagination); `print:break-inside-avoid` on `<tr>` to prevent mid-row splits; print color classes on all table cells
+- Fixed mobile nav: profile link was `hidden sm:block` (invisible on mobile). Changed to always visible with `max-w-[120px] truncate` on mobile to avoid crowding the Dark button
+
+### Decisions made
+- `no-print` on the left section directly (not CSS selector) — robust against DOM restructuring
+- `print:overflow-visible` on table wrapper — `overflow-x-auto` is opaque to the print engine and can cause unexpected page breaks inside it
+
+### Blockers / open questions
+- **⚠️ Set up custom SMTP (Resend) — do this before heavy testing.**
+  Supabase's shared email pool flagged the project for bounced emails. Steps:
+  1. Create account at resend.com, get API key
+  2. Supabase Dashboard → Project Settings → Auth → SMTP Settings → enable custom SMTP
+  3. Host: `smtp.resend.com` · Port: `465` · Username: `resend` · Password: `<Resend API key>`
+  4. Sender: `noreply@yourdomain.com` (or `onboarding@resend.dev` for sandbox)
+
+### Start here next session
+1. **Set up Resend SMTP** (see blockers above) — takes ~5 min, unblocks real email flow
+2. Next feature: **supplier order export** — per-supplier CSV download (last unbuilt item from `docs/MASTER_PLAN.md` §8)
+3. Start with `/office-hours` → `/opsx:propose "supplier-order-export"` → `/plan-eng-review`
+
+---
+
 ## Session — 2026-07-01 (auth fix + magic link)
 
 **Status:** Magic link auth fully working locally and deployed. One outstanding config task: custom SMTP (see blockers).
