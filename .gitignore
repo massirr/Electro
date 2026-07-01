@@ -51,8 +51,8 @@ test-results/
 playwright-report/
 .playwright-mcp/
 
-# QA screenshots captured during testing sessions
-qa-*.png
+# Playwright screenshots — saved to screenshots/ during dev/QA sessions
+screenshots/
 
 # TypeScript incremental build info
 tsconfig.tsbuildinfo
