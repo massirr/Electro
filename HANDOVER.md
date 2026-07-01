@@ -28,6 +28,34 @@
 
 ---
 
+## Session — 2026-07-01 (SMTP, print, mobile nav, Playwright)
+
+**Status:** Auth fully working on production via Supabase built-in email. Print PDF works (single page for short quotes). Mobile nav shows profile. Login flow verified with Playwright.
+
+### Done
+- Fixed magic link redirect: middleware now forwards `?code=` on any path to `/auth/callback` (Supabase strips the path from `redirect_to` and lands on bare `site_url`)
+- Fixed print blank page: `no-print` added directly to left `<section>` inside TakeoffForm; removed fragile CSS selector from globals.css
+- Fixed print spilling to page 2: `print:space-y-4`, `print:p-3`, `print:py-1` on summary card; `print:overflow-visible` on LineItemsTable; `print:break-inside-avoid` on `<tr>`
+- Fixed mobile nav: profile link was `hidden sm:block` — now always visible with `max-w-[120px] truncate`
+- Fixed `{}` error display on login page: empty Supabase error object now shows "Failed to send link. Please try again."
+- Tried Resend SMTP (port 465 → 587): blocked by Resend sandbox — can only send to account owner email without domain verification. Reverted to Supabase built-in email
+- Playwright test confirmed: login form submits, "Check your inbox" screen shows, email delivered via Supabase pool
+
+### Decisions made
+- Supabase built-in email over Resend: Resend requires owning the sender domain; Supabase pool is simpler for low-volume personal use. The bounce issue earlier was from fake test addresses, not real users
+- `supabase config push` with `enabled = false` (not just removing the section) is required to revert remote SMTP settings — removing the section from config.toml leaves the remote unchanged
+- `no-print` class on the element directly, not structural CSS selector — survives DOM refactoring
+
+### Blockers / open questions
+- None blocking. Email works. Auth works.
+- Optional future improvement: if email volume grows, set up Resend by verifying `irakozedarlo.be` at resend.com/domains (one-time DNS setup), then update `supabase/config.toml` SMTP block and re-push
+
+### Start here next session
+1. Next feature: **supplier order export** — per-supplier CSV download (last unbuilt item from `docs/MASTER_PLAN.md` §8)
+2. Start with `/office-hours` → `/opsx:propose "supplier-order-export"` → `/plan-eng-review`
+
+---
+
 ## Session — 2026-07-01 (print + mobile nav + auth redirect)
 
 **Status:** Auth working on production, print PDF working (single page for short quotes), mobile nav shows profile link. One remaining blocker: Resend SMTP for real email delivery.

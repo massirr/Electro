@@ -21,7 +21,7 @@ Electro is a tool for electricians: Takeoff → Quote → Supplier Orders.
 - Bun v1+ (runtime + package manager)
 - Next.js 15 (App Router) + TypeScript 5
 - Tailwind CSS 4 + shadcn/ui
-- Supabase (auth, Postgres DB, email OTP) — project ref: `mwtghmwlvootwhpnktpe`
+- Supabase (auth, Postgres DB, magic link email) — project ref: `mwtghmwlvootwhpnktpe`
 - Vitest (tests)
 
 ## Workflow
@@ -50,7 +50,9 @@ For each OpenSpec change: propose → eng-review → apply → review → ship �
 - Dev server: `bun dev`
 - Tests: `bun test`
 - CLI pipeline: `bun run src/index.ts`
-- No local PocketBase needed — auth and DB are hosted on Supabase
+- No local services needed — auth and DB are hosted on Supabase
+- Auth flow: magic link via `signInWithOtp` → Supabase sends email → user clicks link → `/auth/callback` exchanges PKCE code for session
+- Email: Supabase built-in pool (no custom SMTP). To upgrade: verify a domain at resend.com/domains and update `supabase/config.toml` `[auth.email.smtp]`
 
 ## Deployment
 - **Deploy = `git push origin main`** — Vercel is connected to GitHub, auto-deploys on push
