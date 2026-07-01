@@ -372,7 +372,7 @@ export function TakeoffForm({
     <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-6">
       {/* Left: Takeoff table */}
       <section
-        className="rounded-lg p-4 sm:p-6"
+        className="no-print rounded-lg p-4 sm:p-6"
         style={{ background: "var(--surface-1)", border: "1px solid var(--hairline)", boxShadow: "var(--card-shadow)" }}
       >
         <h2 className="text-xs font-semibold tracking-widest uppercase text-[var(--ink-muted)] mb-4">
