@@ -15,10 +15,6 @@ Available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-desig
 /design-consultation, /review, /investigate, /qa, /ship, /cso, /autoplan, /careful, /freeze,
 /guard, /unfreeze, /retro, /document-release, /learn
 
-Available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review,
-/design-consultation, /review, /investigate, /qa, /ship, /cso, /autoplan, /careful, /freeze,
-/guard, /unfreeze, /retro, /document-release, /learn
-
 ## Which tool to use for what
 
 | Task | Tool |
@@ -54,6 +50,13 @@ Update HANDOVER.md — add a new entry at the top with: what was done, decisions
 ## Domain knowledge
 docs/domain-knowledge.md is the source of truth for Belgian electrician business rules (VAT, catalog, quotes, BTW, account types).
 Whenever new domain context arrives in conversation — from the user, client feedback, or research — update docs/domain-knowledge.md immediately before continuing.
+
+## Deployment
+**Deploy = `git push origin main`** — Vercel is connected to GitHub and auto-deploys on every push to main.
+Never use the `vercel` CLI manually for deploys. Never invoke `vercel:deploy` skill without first checking `.vercel/project.json` and whether GitHub CI handles it.
+
+Production URL: https://electro-quote.vercel.app
+Supabase project ref: `mwtghmwlvootwhpnktpe`
 
 ## Runtime
 Package manager is **Bun**. Always use `bun dev`, `bun test`, `bun run <script>`. Never `npm run` or `npx`.

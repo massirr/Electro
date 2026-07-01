@@ -21,39 +21,46 @@ Electro is a tool for electricians: Takeoff → Quote → Supplier Orders.
 - Bun v1+ (runtime + package manager)
 - Next.js 15 (App Router) + TypeScript 5
 - Tailwind CSS 4 + shadcn/ui
-- PocketBase v0.22+ (single binary, SQLite, built-in auth)
+- Supabase (auth, Postgres DB, email OTP) — project ref: `mwtghmwlvootwhpnktpe`
 - Vitest (tests)
 
 ## Workflow
 1. /office-hours — challenge the requirement before writing a line
-2. /plan-eng-review — lock architecture, data flow, edge cases
-3. Implement (one micro-step at a time)
-4. /review — find bugs before they reach main
-5. /ship — tests, coverage, PR
+2. /opsx:propose "feature" — create the spec in openspec/changes/
+3. /plan-eng-review — lock architecture, data flow, edge cases
+4. Implement (one micro-step at a time)
+5. /review — find bugs before they reach main
+6. /ship — tests, coverage, PR
+7. /opsx:archive — close the spec
 
 For each OpenSpec change: propose → eng-review → apply → review → ship → archive
 
 ## Key Paths
-- Domain logic: src/domain/
-- I/O layer: src/io/
-- API routes: src/app/api/
-- Tests: tests/
-- Sample data: data/sample-inputs/
-- PocketBase binary: infra/pocketbase/pocketbase
-- PocketBase migrations: infra/pocketbase/pb_migrations/
+- Domain logic: `src/domain/`
+- I/O layer: `src/io/`
+- API routes: `src/app/api/`
+- Supabase clients: `src/lib/supabase/client.ts` (browser), `src/lib/supabase/server.ts` (server)
+- Auth hook: `src/hooks/useAuth.ts`
+- Session middleware: `src/middleware.ts`
+- DB migrations: `supabase/migrations/`
+- Tests: `tests/`
+- Sample data: `data/sample-inputs/`
 
-## Running
-- Dev server: bun dev
-- Tests: bun test
-- CLI pipeline: bun run src/index.ts
-- PocketBase: ./infra/pocketbase/pocketbase serve
-- Seed: bun run scripts/seed-pocketbase.ts
+## Running locally
+- Dev server: `bun dev`
+- Tests: `bun test`
+- CLI pipeline: `bun run src/index.ts`
+- No local PocketBase needed — auth and DB are hosted on Supabase
+
+## Deployment
+- **Deploy = `git push origin main`** — Vercel is connected to GitHub, auto-deploys on push
+- Production URL: https://electro-quote.vercel.app
+- Never use `vercel` CLI manually for deploys
 
 ## Quality Gates
 | Gate | Command | Expected |
 |------|---------|----------|
-| Unit tests | bun test | 0 failures |
-| CLI pipeline | bun run src/index.ts | Correct quote numbers |
-| API route | bun test tests/api/ | 200 response, correct JSON |
-| Dev server | bun dev | No errors, page loads |
-| PocketBase | ./pocketbase serve | Starts, seed data present |
+| Unit tests | `bun test` | 0 failures |
+| CLI pipeline | `bun run src/index.ts` | Correct quote numbers |
+| Dev server | `bun dev` | No errors, page loads, redirects to /login |
+| Build | `bun run build` | No TypeScript errors |

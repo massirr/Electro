@@ -28,6 +28,43 @@
 
 ---
 
+## Session — 2026-07-01
+
+**Status:** Fully migrated from PocketBase to Supabase. Deployed to Vercel at https://electro-quote.vercel.app. OTP auth live with real email delivery via Supabase.
+
+### Done
+- Migrated auth from PocketBase OTP → Supabase OTP (`signInWithOtp` + `verifyOtp`)
+- Replaced `src/lib/pb.ts` + `src/lib/pb-client.ts` with `src/lib/supabase/client.ts` + `src/lib/supabase/server.ts`
+- Added `src/middleware.ts` for Supabase SSR session refresh on every request
+- Rewrote `src/hooks/useAuth.ts` — now uses Supabase session + `profiles` table for custom fields
+- Rewrote `GET/POST /api/quotes` and `GET/DELETE /api/quotes/[id]` — now use Supabase with RLS
+- Created `supabase/migrations/001_schema.sql` — `profiles`, `projects`, `takeoff_items` with RLS policies
+- Applied migration to remote Supabase project (`supabase db push`)
+- Added Supabase env vars to Vercel production
+- App is deployed and live at **https://electro-quote.vercel.app**
+- Updated `CLAUDE.md`: gstack skill priority rule, deploy = `git push origin main`
+- Updated `AGENTS.md`: removed PocketBase references, updated stack + running instructions
+
+### Decisions made
+- Supabase replaces PocketBase entirely — simpler ops, built-in email, hosted Postgres
+- `profiles` table extends `auth.users` for custom fields (btwNumber, hourlyRate, name)
+- RLS enforced on all tables — users can only see/modify their own data
+- `shouldCreateUser: false` in `signInWithOtp` — users must be created manually in Supabase dashboard (no self-signup yet)
+- Vercel is connected to GitHub — deploy = `git push origin main`, never use Vercel CLI manually
+
+### Blockers / open questions
+- Add production URL to Supabase redirect URLs: **Authentication → URL Configuration** → Site URL: `https://electro-quote.vercel.app`, Redirect: `https://electro-quote.vercel.app/**`
+- First real user needs to be created in Supabase Dashboard → Authentication → Users (or enable `shouldCreateUser: true` for self-signup)
+- Supabase project ref: `mwtghmwlvootwhpnktpe`
+
+### Start here next session
+1. Confirm Supabase redirect URL is set (see blockers above)
+2. Create a user in Supabase Dashboard → Authentication → Users, test OTP login on production
+3. Next feature: **supplier order export** — per-supplier CSV download (last unbuilt item from `docs/MASTER_PLAN.md` §8)
+4. Start with `/office-hours` → `/opsx:propose "supplier-order-export"` → `/plan-eng-review`
+
+---
+
 ## Session — 2026-06-30
 
 **Status:** App fully runnable locally. OTP auth working end-to-end. PocketBase configured with Mailpit for local email.
