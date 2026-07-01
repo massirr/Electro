@@ -16,8 +16,10 @@ function exportCSV(groups: SupplierGroup[]) {
   const a = document.createElement("a");
   a.href = url;
   a.download = "supplier-order.csv";
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
 }
 
 export function SupplierBreakdown({ groups }: { groups: SupplierGroup[] }) {
