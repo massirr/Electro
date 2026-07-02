@@ -78,9 +78,60 @@ const FIELD_LABELS: Record<Field, string> = {
   price: "Price (€)", category: "Category", "": "— skip —",
 };
 
+const SUPPLIERS = [
+  {
+    name: "Cebeo",
+    steps: [
+      "Log in at b2b.cebeo.be",
+      "Go to Export (top menu)",
+      "Choose format CSV or XLSX — save as CSV",
+      "Upload that file here",
+    ],
+  },
+  {
+    name: "Rexel",
+    steps: [
+      "Log in at rexel.be (Netstore)",
+      "My account → Price list → Export",
+      "Choose CSV format",
+      "Upload that file here",
+    ],
+  },
+];
+
+function HelpPanel({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="mt-2 rounded-lg border border-[var(--hairline)] bg-[var(--surface-2)] p-4 space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-[var(--ink)]">How to get your price list</p>
+        <button type="button" onClick={onClose} className="text-xs text-[var(--ink-subtle)] hover:text-[var(--ink)]">✕ Close</button>
+      </div>
+      <div className="grid sm:grid-cols-2 gap-4">
+        {SUPPLIERS.map(({ name, steps }) => (
+          <div key={name}>
+            <p className="text-xs font-semibold text-[var(--ink-muted)] mb-2">{name}</p>
+            <ol className="space-y-1">
+              {steps.map((step, i) => (
+                <li key={i} className="flex gap-2 text-xs text-[var(--ink-subtle)]">
+                  <span className="flex-shrink-0 font-medium text-[var(--accent)]">{i + 1}.</span>
+                  {step}
+                </li>
+              ))}
+            </ol>
+          </div>
+        ))}
+      </div>
+      <p className="text-xs text-[var(--ink-subtle)] border-t border-[var(--hairline)] pt-3">
+        The importer handles both <strong>comma</strong> and <strong>semicolon</strong> delimiters and lets you map columns before importing. Existing products are updated by SKU — no duplicates.
+      </p>
+    </div>
+  );
+}
+
 export function CsvImporter() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [stage, setStage] = useState<Stage>("idle");
+  const [showHelp, setShowHelp] = useState(false);
   const [parsed, setParsed] = useState<ParsedCSV | null>(null);
   const [mapping, setMapping] = useState<Field[]>([]);
   const [count, setCount] = useState(0);
@@ -146,17 +197,33 @@ export function CsvImporter() {
 
   if (stage === "idle") {
     return (
-      <>
-        <input ref={fileRef} type="file" accept=".csv,.txt" className="hidden" onChange={onFile} />
-        <button
-          type="button"
-          onClick={() => fileRef.current?.click()}
-          className="text-xs px-3 py-1.5 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] transition-colors"
-        >
-          Import CSV
-        </button>
+      <div>
+        <div className="flex items-center gap-2">
+          <input ref={fileRef} type="file" accept=".csv,.txt" className="hidden" onChange={onFile} />
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className="text-xs px-3 py-1.5 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] transition-colors"
+          >
+            Import CSV
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowHelp(h => !h)}
+            aria-label="How to export from your supplier"
+            title="How to export from your supplier"
+            className={`w-6 h-6 rounded-full text-xs font-semibold border transition-colors flex items-center justify-center ${
+              showHelp
+                ? "bg-[var(--accent)] border-[var(--accent)] text-white"
+                : "border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)]"
+            }`}
+          >
+            ?
+          </button>
+        </div>
+        {showHelp && <HelpPanel onClose={() => setShowHelp(false)} />}
         {error && <p className="text-xs text-[var(--error)] mt-1">{error}</p>}
-      </>
+      </div>
     );
   }
 

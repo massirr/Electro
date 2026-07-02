@@ -119,6 +119,32 @@ docs/
 
 ---
 
+## Importing supplier prices
+
+Rather than typing prices manually, you can import a CSV price list directly from your supplier's B2B portal. The importer auto-detects the column delimiter (`,` or `;`) and lets you map columns before importing. Existing products are updated by SKU — no duplicates created.
+
+### Cebeo
+
+1. Log in at [b2b.cebeo.be](https://b2b.cebeo.be)
+2. Go to **Export** in the top menu
+3. Choose format **CSV** (or XLSX saved as CSV)
+4. Go to **Catalog → Import CSV** in Electro and upload the file
+
+### Rexel
+
+1. Log in at [rexel.be](https://www.rexel.be) (Netstore account)
+2. **My account → Price list → Export**
+3. Choose CSV format
+4. Go to **Catalog → Import CSV** in Electro and upload the file
+
+### Column mapping
+
+After uploading, Electro shows your file's column headers and guesses which maps to SKU, Name, Price, Supplier, and Category based on the header name (supports Dutch and French column names). Adjust any mismatches with the dropdowns before confirming the import.
+
+> **Prices are customer-specific.** Belgian suppliers (Cebeo, Rexel) negotiate rates per account, so the prices in your export reflect your actual net prices — not public catalog rates.
+
+---
+
 ## Domain knowledge
 
 Belgian-specific rules are documented in [`docs/domain-knowledge.md`](docs/domain-knowledge.md):
