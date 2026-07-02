@@ -4,13 +4,18 @@ import { resolve } from "path";
 
 const DATA = resolve(process.cwd(), "data/sample-inputs");
 
+// Avoids a DB round-trip on every warm request — resets only on cold start
+const seededUsers = new Set<string>();
+
 export async function ensureCatalogSeeded(supabase: SupabaseClient, userId: string) {
+  if (seededUsers.has(userId)) return;
+
   const { count } = await supabase
     .from("catalog_products")
     .select("id", { count: "exact", head: true })
     .eq("owner", userId);
 
-  if (count && count > 0) return;
+  if (count && count > 0) { seededUsers.add(userId); return; }
 
   const [csvText, jsonText] = await Promise.all([
     readFile(`${DATA}/sample-catalog.csv`, "utf-8"),
@@ -50,4 +55,5 @@ export async function ensureCatalogSeeded(supabase: SupabaseClient, userId: stri
       );
     }
   }
+  seededUsers.add(userId);
 }

@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { ensureCatalogSeeded } from "@/lib/catalog-seed";
 import { ProductsTable } from "@/components/catalog/ProductsTable";
 import { KitsTable } from "@/components/catalog/KitsTable";
 import { CsvImporter } from "@/components/catalog/CsvImporter";
@@ -9,8 +8,6 @@ export default async function CatalogPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-
-  await ensureCatalogSeeded(supabase, user.id);
 
   const [{ data: products }, { data: kits }] = await Promise.all([
     supabase.from("catalog_products").select("id, sku, name, supplier, price, category").eq("owner", user.id).order("name"),
