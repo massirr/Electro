@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ensureCatalogSeeded } from "@/lib/catalog-seed";
 import { ProductsTable } from "@/components/catalog/ProductsTable";
 import { KitsTable } from "@/components/catalog/KitsTable";
+import { CsvImporter } from "@/components/catalog/CsvImporter";
 
 export default async function CatalogPage() {
   const supabase = await createClient();
@@ -27,7 +28,10 @@ export default async function CatalogPage() {
 
       <div className="space-y-10">
         <section>
-          <h2 className="text-xs font-semibold tracking-widest uppercase text-[var(--ink-muted)] mb-4">Products</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xs font-semibold tracking-widest uppercase text-[var(--ink-muted)]">Products</h2>
+            <CsvImporter />
+          </div>
           <div className="rounded-lg p-4" style={{ background: "var(--surface-1)", border: "1px solid var(--hairline)", boxShadow: "var(--card-shadow)" }}>
             <ProductsTable initial={products ?? []} />
           </div>
