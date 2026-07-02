@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginPage() {
   const { user, loading, requestOTP } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackError = searchParams.get("error");
 
   const [sent, setSent] = useState(false);
   const [email, setEmail] = useState("");
@@ -60,6 +62,9 @@ export default function LoginPage() {
                   className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
                 />
               </div>
+              {callbackError && (
+                <p className="text-xs text-[var(--error)]">Sign-in failed: {callbackError}</p>
+              )}
               {error && <p className="text-xs text-[var(--error)]">{error}</p>}
               <button
                 type="submit"
