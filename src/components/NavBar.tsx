@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { useInactivityLogout } from "@/hooks/useInactivityLogout";
 
 type Theme = "dark" | "light";
 
@@ -34,6 +35,7 @@ export function NavBar() {
   const [theme, setTheme] = useState<Theme>("dark");
   const { user } = useAuth();
   const pathname = usePathname();
+  useInactivityLogout();
 
   useEffect(() => {
     const current = document.documentElement.classList.contains("light") ? "light" : "dark";
