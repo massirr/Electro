@@ -28,6 +28,43 @@
 
 ---
 
+## Session — 2026-07-03 (catch-up: 16 unlogged commits, 2026-07-01 through 2026-07-03)
+
+**Status:** HANDOVER.md was 2 days and 16 commits stale — several sessions shipped features without writing an entry. This entry reconstructs what actually happened from `git log` so the record matches `main`. Build verified clean (`bun install && bun run build`) as of now.
+
+### Done (in commit order)
+- `6d12d07` fix: CSV export download not triggering on Safari/WebKit
+- `34f38c5` feat: **catalog management UI** (`/catalog` page) — products and kit assemblies now live in per-user Supabase tables (auto-seeded from static defaults on first visit) instead of static files; full kit editor for SKU+qty components. This was the "optional next" item from the 07-01 Hugues session.
+- `dd846b6` feat: UI polish — NavBar avatar circle + active-page highlight + SVG moon/sun toggle, 3-step onboarding card on home page, delete-account button on profile (double-tap confirm; migration `003` sets catalog rows to `ON DELETE SET NULL` so deleting a user doesn't cascade-delete their catalog)
+- `b071a57` feat: auto sign-out after 60 min of inactivity (`useInactivityLogout` hook, wired via NavBar)
+- `e7fe48c` docs: README rewritten for open-source release, MIT license added
+- `a7d66a0` feat: **CSV import** for catalog products — upserts by SKU, auto-detects `;` vs `,` delimiter and strips UTF-8 BOM (Belgian supplier exports)
+- `8ad0665` docs: CSV import guide added to README + in-app help panel
+- `c90c973` docs: `docs/ai-assistant.md` — full design spec for a future AI assistant feature (Groq/Llama, Jina web search, Vercel AI SDK, AREI/RGIE guardrails). Design-only, not built.
+- `b1e03d8` fix: auth callback errors now surfaced on the login page instead of failing silently
+- `b811ff3` fix: wrapped `useSearchParams` in Suspense on login page — was breaking the Vercel build under Next.js 15
+- `b62f6d0` perf: catalog page load cut from 3 sequential DB calls to 2 parallel (module-level cache of already-seeded user IDs)
+- `b570850`→`12c26cc`→`b117e63`→`e6f8553`→`c9641c1` feat: **Vercel Analytics**, four follow-up fix commits chasing a bun/subpath resolution issue on Vercel's build image (`/react` export → `/next` export → lockfile bun-version mismatch → finally settled on a `Script`-tag/`inject()` wrapper in `src/components/Analytics.tsx` that avoids subpath imports entirely). This is the shipped, working version.
+
+### Decisions made
+- Catalog data moved from static files to per-user Supabase tables — necessary precondition for both the catalog UI and CSV import; each user gets their own editable price list
+- Account deletion preserves catalog rows (`ON DELETE SET NULL`) rather than cascading — avoids silently destroying a user's price list history
+- AI assistant feature was speced but deliberately not built — spec exists at `docs/ai-assistant.md` for when it's prioritized
+- Vercel Analytics: settled on manual `inject()` + `Script` tag over the `@vercel/analytics/react` package import, because bun 1.3.12 (Vercel's build image) fails to resolve that subpath export — this is the stable pattern going forward, don't revert to the plain package import
+
+### Blockers / open questions
+- None blocking; build is green.
+- `docs/MASTER_PLAN.md` header still says "Last updated: 2026-06-24" and doesn't reflect any of this work — worth a pass if it's still being used to track phases
+- AI assistant spec (`docs/ai-assistant.md`) is ready to build whenever prioritized
+
+### Start here next session
+1. Confirm whether `docs/MASTER_PLAN.md` phase tracking is still in use; update or retire it
+2. Optional: build the AI assistant feature from `docs/ai-assistant.md` if prioritized
+3. Optional: real Belgian supplier prices (Rexel/CEBO catalog) — noted in `docs/domain-knowledge.md`
+4. Going forward: write a HANDOVER.md entry at the end of every session — this catch-up entry is what happens when it's skipped
+
+---
+
 ## Session — 2026-07-01 (Hugues features: hours-to-catalog, hide-cost-pdf, CSV export, duplication)
 
 **Status:** All 4 features from Hugues customer feedback shipped and deployed to main.
