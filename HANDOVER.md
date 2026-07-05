@@ -28,6 +28,38 @@
 
 ---
 
+## Session — 2026-07-05 (implemented professional-quote-pdf)
+
+**Status:** `professional-quote-pdf` spec fully implemented and pushed to `claude/read-handoff-q9ev2o`. Build/typecheck/tests clean, PDF generation smoke-tested locally (writes a valid 1-page PDF). **Not yet applied to production**: migration 004 hasn't been run against Supabase, and Resend isn't configured, so the email-send path will 501 until both are set up.
+
+### Done
+- Implemented the full spec: `@react-pdf/renderer` branded offerte template (`QuotePdfDocument.tsx`) with letterhead, quote metadata (reference/validity/delivery date/customer reference), and signature blocks
+- `GET /api/quotes/[id]/pdf` (download, always works) and `POST /api/quotes/[id]/send` (optional, gated on `RESEND_API_KEY`+`RESEND_FROM_EMAIL`) — both share one generator (`src/lib/quotePdf.tsx`)
+- Migration `004_quote_metadata.sql`: letterhead fields on `profiles`; `quote_reference`/`validity_days`/`delivery_date`/`customer_reference`/`sent_at` on `projects`; a partial unique index on `(owner, quote_reference)`
+- Profile page and TakeoffForm got new fields for the letterhead and per-quote metadata; QuotesList got Download/Email buttons with sent-state tracking
+- Ran an 8-angle code review pass on the diff before calling it done, and fixed everything that survived verification — the most important one: **POST /api/quotes was computing `grand_total` from a stale static CSV file** while the live quote builder and the new PDF/email routes read the real per-owner DB catalog. That's a pre-existing bug (predates this session) but this feature would have made the divergence visible to customers for the first time, so it got fixed as part of this change (extracted `loadCatalogAndKits()` as the one shared DB-catalog loader for `/api/quote`, `/api/quotes`, and the PDF generator)
+- Also fixed: a `quote_reference` race condition (added unique index + retry-on-conflict), the duplicate-quote route dropping quote metadata, a silently-swallowed network error on the "Email to customer" button, an unescaped company name that could break the email's From header, and a `parseInt(...) || 30` bug that silently overrode an explicit `0` for validity days
+- Deduped sort/summary/currency-formatting logic between the on-screen quote and the PDF template (`sortLineItems`/`buildQuoteSummaryRows` in `calculators.ts`, `formatCurrency` in `lib/format.ts`) so the two can't drift apart
+
+### Decisions made
+- Kept the browser `window.print()` path for the electrician's own on-screen preview; the new react-pdf template is the actual customer-facing artifact (download or email)
+- Resend is a single platform-level account (not per-electrician) — From display name = electrician's company name, Reply-To = electrician's account email, technical From = `RESEND_FROM_EMAIL`
+- Fixed the stale-static-catalog bug in `POST /api/quotes` in this same change rather than filing separately, since the new PDF/email routes would otherwise expose it directly to customers as a totals mismatch
+
+### Blockers / open questions
+- **Migration 004 not yet applied** — no `supabase` CLI in this environment; user needs to run `supabase db push` (or apply manually) before any of this works against the real DB
+- **Resend not configured** — needs `RESEND_API_KEY` + `RESEND_FROM_EMAIL` env vars in Vercel, and one-time domain verification of `irakozedarlo.be` at resend.com/domains, before the "Email to customer" button will do anything but show a friendly 501
+- `docs/MASTER_PLAN.md` still stale (dated 2026-06-24) — flagged again, still not addressed
+- `multilingual-app` proposal is still just a draft, unimplemented — was intentionally sequenced after this one
+
+### Start here next session
+1. Apply migration 004 to the real Supabase project, then configure Resend env vars + domain verification to unblock email-sending
+2. Manually test the full flow in a browser: save a quote, download the PDF, and (once Resend is set up) send one to a real inbox
+3. Then pick up `multilingual-app` — this feature's PDF template already writes its copy in a way that should slot into i18n without restructuring
+4. Optional: `docs/MASTER_PLAN.md` cleanup
+
+---
+
 ## Session — 2026-07-05 (spec research: professional PDF quotes + multilingual app)
 
 **Status:** No app code changed this session — pure research + spec drafting. Two OpenSpec proposals written and pushed to `claude/read-handoff-q9ev2o`, neither implemented yet. HANDOVER.md catch-up from the prior session (see below) is also part of this branch.
