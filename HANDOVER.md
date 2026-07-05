@@ -28,6 +28,39 @@
 
 ---
 
+## Session — 2026-07-05 (spec research: professional PDF quotes + multilingual app)
+
+**Status:** No app code changed this session — pure research + spec drafting. Two OpenSpec proposals written and pushed to `claude/read-handoff-q9ev2o`, neither implemented yet. HANDOVER.md catch-up from the prior session (see below) is also part of this branch.
+
+### Done
+- Read HANDOVER.md, found it 16 commits / 2 days stale (see catch-up entry below) — reconstructed and committed the missing history
+- Researched feasibility of "professional PDF quotes" from a reference Dutch/Belgian "OFFERTE" template image the user shared
+- Wrote `openspec/changes/professional-quote-pdf/proposal.md`: branded PDF via `@react-pdf/renderer` (rejected Puppeteer/headless-Chromium given the bun-on-Vercel pain already hit with Analytics; rejected third-party PDF SaaS for cost + PII exposure), with **two independent delivery paths**: `GET /api/quotes/[id]/pdf` (download, always available, zero Resend dependency) and `POST /api/quotes/[id]/send` (optional, emails the same PDF via Resend)
+- Clarified and wrote up the Resend multi-tenancy model after user confusion: Resend is one platform-level account (deployer verifies `irakozedarlo.be` once), never per-electrician; From display name = electrician's company name, Reply-To = electrician's account email, technical From stays `quotes@irakozedarlo.be`
+- Wrote `openspec/changes/multilingual-app/proposal.md`: whole-app EN/FR/NL via `next-intl`, URL-prefixed locales, plus a **per-quote language field** independent of the electrician's own UI language (so a French-UI electrician can send a Dutch offerte). Flagged as depending on `professional-quote-pdf` shipping first so its PDF template is written against translation keys from the start
+- Both proposals committed and pushed (commits `79907d6`, `c9a993c`)
+
+### Decisions made
+- PDF generation: `@react-pdf/renderer`, not Puppeteer/Playwright — pure JS, no headless browser, avoids repeating the bun/Vercel subpath-resolution class of bug from the Analytics saga
+- Downloading the branded PDF must **never** depend on Resend being configured — email-sending is a strictly optional add-on button, not a requirement (explicit user correction mid-session)
+- Letterhead is text-only (name/address/phone/website) — no logo upload in v1
+- Signature blocks included (static print lines, no e-signature capture)
+- i18n: per-quote language picker, independent of the electrician's own UI language setting
+- Sequencing: ship `professional-quote-pdf` before `multilingual-app` to avoid re-touching the PDF template once translation keys exist
+
+### Blockers / open questions
+- Neither proposal is implemented — both are Draft status, not yet through `/plan-eng-review`
+- Resend domain verification for `irakozedarlo.be` is still not done (same blocker noted since 2026-07-01) — needed before the email-sending half of `professional-quote-pdf` can work; the download-PDF half doesn't need it at all
+- `docs/MASTER_PLAN.md` still stale (dated 2026-06-24) — flagged again, not addressed
+
+### Start here next session
+1. User is continuing locally from here — pick up wherever they left off on these two specs
+2. If moving `professional-quote-pdf` forward: `/plan-eng-review` first, then implement `@react-pdf/renderer` + the two delivery routes
+3. If doing the Resend domain verification step, it unblocks only the optional email-send path, not the PDF download/branding work
+4. `multilingual-app` should wait until `professional-quote-pdf`'s PDF template exists, per the sequencing decision above
+
+---
+
 ## Session — 2026-07-03 (catch-up: 16 unlogged commits, 2026-07-01 through 2026-07-03)
 
 **Status:** HANDOVER.md was 2 days and 16 commits stale — several sessions shipped features without writing an entry. This entry reconstructs what actually happened from `git log` so the record matches `main`. Build verified clean (`bun install && bun run build`) as of now.
