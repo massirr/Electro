@@ -1,8 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { buildQuote } from "@/domain/calculators";
-import type { Kit, Product } from "@/domain/types";
-import { ensureCatalogSeeded } from "@/lib/catalog-seed";
+import { loadCatalogAndKits } from "@/lib/catalog-seed";
 import { QuotePdfDocument, type QuotePdfDocumentProps } from "@/components/quote/QuotePdfDocument";
 
 export interface ProjectQuoteData {
@@ -18,46 +17,20 @@ export async function loadProjectQuote(
   projectId: string,
   ownerId: string
 ): Promise<ProjectQuoteData | null> {
-  const { data: project, error: projError } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("id", projectId)
-    .eq("owner", ownerId)
-    .single();
-
-  if (projError || !project) return null;
-
-  const { data: items, error: itemsError } = await supabase
-    .from("takeoff_items")
-    .select("*")
-    .eq("project_id", projectId);
-
-  if (itemsError) return null;
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("name, btw_number, company_address, company_phone, company_website")
-    .eq("id", ownerId)
-    .single();
-
-  await ensureCatalogSeeded(supabase, ownerId);
-
-  const [{ data: products }, { data: kitRows }] = await Promise.all([
-    supabase.from("catalog_products").select("sku, name, supplier, price, category").eq("owner", ownerId),
-    supabase.from("catalog_kits").select("slug, catalog_kit_components(sku, quantity_per_unit)").eq("owner", ownerId),
+  // project/items/profile are independent reads — run concurrently instead of serially
+  const [
+    { data: project, error: projError },
+    { data: items, error: itemsError },
+    { data: profile },
+  ] = await Promise.all([
+    supabase.from("projects").select("*").eq("id", projectId).eq("owner", ownerId).single(),
+    supabase.from("takeoff_items").select("*").eq("project_id", projectId),
+    supabase.from("profiles").select("name, btw_number, company_address, company_phone, company_website").eq("id", ownerId).single(),
   ]);
 
-  const catalog = new Map<string, Product>(
-    (products ?? []).map((p) => [p.sku, { sku: p.sku, name: p.name, supplier: p.supplier, price: p.price, category: p.category }])
-  );
+  if (projError || !project || itemsError) return null;
 
-  const kits: Kit[] = (kitRows ?? []).map((k) => ({
-    takeoffId: k.slug,
-    components: ((k.catalog_kit_components as { sku: string; quantity_per_unit: number }[]) ?? []).map((c) => ({
-      sku: c.sku,
-      quantityPerUnit: c.quantity_per_unit,
-    })),
-  }));
+  const { catalog, kits } = await loadCatalogAndKits(supabase, ownerId);
 
   const takeoffItems = (items ?? []).map((i) => ({
     id: i.external_item_id,

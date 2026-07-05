@@ -1,13 +1,9 @@
 import type { LineItem } from "@/domain/types";
-
-function fmt(n: number) {
-  return n.toLocaleString("fr-BE", { style: "currency", currency: "EUR" });
-}
+import { sortLineItems } from "@/domain/calculators";
+import { formatCurrency as fmt } from "@/lib/format";
 
 export function LineItemsTable({ items }: { items: LineItem[] }) {
-  const sorted = [...items].sort((a, b) =>
-    a.supplier.localeCompare(b.supplier) || a.name.localeCompare(b.name)
-  );
+  const sorted = sortLineItems(items);
 
   return (
     <div className="overflow-x-auto print:overflow-visible">

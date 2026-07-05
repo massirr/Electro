@@ -1,11 +1,8 @@
 import type { QuoteResult } from "@/domain/types";
-import { groupBySupplier } from "@/domain/calculators";
+import { groupBySupplier, buildQuoteSummaryRows } from "@/domain/calculators";
+import { formatCurrency as fmt } from "@/lib/format";
 import { SupplierBreakdown } from "./SupplierBreakdown";
 import { LineItemsTable } from "./LineItemsTable";
-
-function fmt(n: number) {
-  return n.toLocaleString("fr-BE", { style: "currency", currency: "EUR" });
-}
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -35,17 +32,8 @@ export function QuotePreview({
   electricianBtw,
 }: QuotePreviewProps) {
   const groups = groupBySupplier(quote.lineItems);
-  const laborVatPct = quote.jobType === "renovation" ? "6%" : "21%";
   const today = new Date().toLocaleDateString("fr-BE");
-
-  const summaryRows: [string, number][] = [
-    ["Labor", quote.laborTotal],
-    ["Materials", quote.materialTotal],
-    ["Subtotal", quote.subtotal],
-    ["Margin 15%", quote.margin],
-    [`Labor VAT ${laborVatPct}`, quote.laborVat],
-    ["Materials VAT 6%", quote.materialVat],
-  ];
+  const summaryRows = buildQuoteSummaryRows(quote);
 
   return (
     <div className="space-y-8 print:space-y-4">

@@ -3,6 +3,12 @@ import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
 import { loadProjectQuote, renderQuotePdfBuffer } from "@/lib/quotePdf";
 
+// Strips characters that would break or inject into the RFC 5322 From header's
+// quoted-string display name (CR/LF header injection, unescaped quotes).
+function sanitizeDisplayName(name: string) {
+  return name.replace(/[\r\n"]/g, "");
+}
+
 export async function POST(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -29,12 +35,12 @@ export async function POST(
   }
 
   const buffer = await renderQuotePdfBuffer(data.pdfProps);
-  const companyName = data.pdfProps.company.name || "Electro";
+  const companyName = sanitizeDisplayName(data.pdfProps.company.name || "Electro");
   const subject = `Offerte ${data.quoteReference || data.projectName}`.trim();
 
   const resend = new Resend(apiKey);
   const { error } = await resend.emails.send({
-    from: `${companyName} <${fromEmail}>`,
+    from: `"${companyName}" <${fromEmail}>`,
     to: data.customerEmail,
     replyTo: user.email ?? undefined,
     subject,
@@ -44,7 +50,7 @@ export async function POST(
 
   if (error) {
     console.error("[POST /api/quotes/[id]/send]", error);
-    return NextResponse.json({ error: "Failed to send email" }, { status: 502 });
+    return NextResponse.json({ error: error.message || "Failed to send email" }, { status: 502 });
   }
 
   await supabase.from("projects").update({ sent_at: new Date().toISOString() }).eq("id", id).eq("owner", user.id);

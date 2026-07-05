@@ -89,7 +89,14 @@ export function useAuth() {
       updated_at: new Date().toISOString(),
     }).eq("id", u.id);
     if (error) throw error;
-    setUser(prev => prev ? { ...prev, ...data, btwNumber: data.btwNumber ?? prev.btwNumber } : null);
+    setUser(prev => prev ? {
+      ...prev,
+      ...data,
+      btwNumber: data.btwNumber ?? prev.btwNumber,
+      companyAddress: data.companyAddress ?? prev.companyAddress,
+      companyPhone: data.companyPhone ?? prev.companyPhone,
+      companyWebsite: data.companyWebsite ?? prev.companyWebsite,
+    } : null);
   }, []);
 
   return { user, loading, requestOTP, logout, updateProfile };

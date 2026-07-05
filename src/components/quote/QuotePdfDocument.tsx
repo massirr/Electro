@@ -1,19 +1,11 @@
 import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
-import type { QuoteResult, LineItem } from "@/domain/types";
-
-function fmtCurrency(n: number) {
-  return n.toLocaleString("fr-BE", { style: "currency", currency: "EUR" });
-}
+import type { QuoteResult } from "@/domain/types";
+import { sortLineItems, buildQuoteSummaryRows } from "@/domain/calculators";
+import { formatCurrency } from "@/lib/format";
 
 function fmtDate(iso: string | null | undefined) {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("fr-BE");
-}
-
-function sortedLineItems(items: LineItem[]) {
-  return [...items].sort(
-    (a, b) => a.supplier.localeCompare(b.supplier) || a.name.localeCompare(b.name)
-  );
 }
 
 const styles = StyleSheet.create({
@@ -125,17 +117,8 @@ export interface QuotePdfDocumentProps {
 }
 
 export function QuotePdfDocument({ company, customer, meta, quote }: QuotePdfDocumentProps) {
-  const laborVatPct = quote.jobType === "renovation" ? "6%" : "21%";
-  const items = sortedLineItems(quote.lineItems);
-
-  const summaryRows: [string, number][] = [
-    ["Labor", quote.laborTotal],
-    ["Materials", quote.materialTotal],
-    ["Subtotal", quote.subtotal],
-    ["Margin", quote.margin],
-    [`Labor VAT ${laborVatPct}`, quote.laborVat],
-    ["Materials VAT 6%", quote.materialVat],
-  ];
+  const items = sortLineItems(quote.lineItems);
+  const summaryRows = buildQuoteSummaryRows(quote);
 
   return (
     <Document>
@@ -201,7 +184,7 @@ export function QuotePdfDocument({ company, customer, meta, quote }: QuotePdfDoc
               <Text style={styles.colName}>{li.name}</Text>
               <Text style={styles.colSupplier}>{li.supplier}</Text>
               <Text style={styles.colQty}>{li.quantity}</Text>
-              <Text style={styles.colTotal}>{fmtCurrency(li.totalPrice)}</Text>
+              <Text style={styles.colTotal}>{formatCurrency(li.totalPrice)}</Text>
             </View>
           ))}
         </View>
@@ -210,12 +193,12 @@ export function QuotePdfDocument({ company, customer, meta, quote }: QuotePdfDoc
           {summaryRows.map(([label, value]) => (
             <View style={styles.summaryRow} key={label}>
               <Text style={styles.muted}>{label}</Text>
-              <Text>{fmtCurrency(value)}</Text>
+              <Text>{formatCurrency(value)}</Text>
             </View>
           ))}
           <View style={styles.grandTotalRow}>
             <Text style={styles.grandTotalLabel}>Totaal</Text>
-            <Text style={styles.grandTotalValue}>{fmtCurrency(quote.grandTotal)}</Text>
+            <Text style={styles.grandTotalValue}>{formatCurrency(quote.grandTotal)}</Text>
           </View>
         </View>
 

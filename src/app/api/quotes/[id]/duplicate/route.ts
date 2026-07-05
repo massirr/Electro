@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { generateQuoteReference } from "@/lib/quoteReference";
 
 export async function POST(
   _req: NextRequest,
@@ -26,22 +27,36 @@ export async function POST(
 
   if (itemsError) return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
 
-  const { data: copy, error: copyError } = await supabase
-    .from("projects")
-    .insert({
-      name: `Copy of ${source.name}`,
-      project_date: new Date().toISOString().slice(0, 10),
-      job_type: source.job_type,
-      hourly_rate: source.hourly_rate,
-      margin_percent: source.margin_percent,
-      grand_total: source.grand_total,
-      owner: user.id,
-      customer_name: "",
-      customer_email: "",
-      customer_address: "",
-    })
-    .select("id, name")
-    .single();
+  // quote_reference has a partial unique index per owner (migration 004) — retry on collision,
+  // same as POST /api/quotes.
+  let copy: { id: string; name: string } | null = null;
+  let copyError: { code?: string; message?: string } | null = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const quoteReference = await generateQuoteReference(supabase, user.id);
+    const result = await supabase
+      .from("projects")
+      .insert({
+        name: `Copy of ${source.name}`,
+        project_date: new Date().toISOString().slice(0, 10),
+        job_type: source.job_type,
+        hourly_rate: source.hourly_rate,
+        margin_percent: source.margin_percent,
+        grand_total: source.grand_total,
+        owner: user.id,
+        customer_name: "",
+        customer_email: "",
+        customer_address: "",
+        quote_reference: quoteReference,
+        validity_days: source.validity_days,
+        delivery_date: null,
+        customer_reference: "",
+      })
+      .select("id, name")
+      .single();
+    copy = result.data;
+    copyError = result.error;
+    if (!copyError || copyError.code !== "23505") break;
+  }
 
   if (copyError || !copy) {
     console.error("[POST /api/quotes/[id]/duplicate] project insert", copyError);

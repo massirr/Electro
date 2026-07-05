@@ -422,7 +422,11 @@ export function TakeoffForm({
               type="number"
               min="1"
               value={validityDays}
-              onChange={(e) => { setValidityDays(parseInt(e.target.value, 10) || 30); setSaveOk(false); }}
+              onChange={(e) => {
+                const parsed = parseInt(e.target.value, 10);
+                setValidityDays(Number.isNaN(parsed) ? 30 : parsed);
+                setSaveOk(false);
+              }}
               className="text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)]"
             />
           </label>

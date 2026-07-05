@@ -119,3 +119,23 @@ export function groupBySupplier(lineItems: LineItem[]): SupplierGroup[] {
     lines,
   }));
 }
+
+// Shared ordering between the on-screen line-items table and the PDF quote template.
+export function sortLineItems(items: LineItem[]): LineItem[] {
+  return [...items].sort(
+    (a, b) => a.supplier.localeCompare(b.supplier) || a.name.localeCompare(b.name)
+  );
+}
+
+// Shared summary breakdown between the on-screen quote preview and the PDF quote template.
+export function buildQuoteSummaryRows(quote: QuoteResult): [string, number][] {
+  const laborVatPct = quote.jobType === "renovation" ? "6%" : "21%";
+  return [
+    ["Labor", quote.laborTotal],
+    ["Materials", quote.materialTotal],
+    ["Subtotal", quote.subtotal],
+    ["Margin", quote.margin],
+    [`Labor VAT ${laborVatPct}`, quote.laborVat],
+    ["Materials VAT 6%", quote.materialVat],
+  ];
+}

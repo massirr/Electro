@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatCurrency as fmt } from "@/lib/format";
 
 interface SavedQuote {
   id: string;
@@ -8,10 +9,6 @@ interface SavedQuote {
   projectDate: string;
   grandTotal: number;
   sentAt: string | null;
-}
-
-function fmt(n: number) {
-  return n.toLocaleString("fr-BE", { style: "currency", currency: "EUR" });
 }
 
 export function QuotesList({
@@ -69,6 +66,8 @@ export function QuotesList({
         return;
       }
       setQuotes((prev) => prev.map((q) => (q.id === id ? { ...q, sentAt: new Date().toISOString() } : q)));
+    } catch {
+      setSendError({ id, message: "Network error — check your connection and try again" });
     } finally {
       setSendingId(null);
     }
