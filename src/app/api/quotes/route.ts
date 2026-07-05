@@ -26,7 +26,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("projects")
-    .select("id, name, project_date, grand_total, created_at")
+    .select("id, name, project_date, grand_total, created_at, sent_at")
     .eq("owner", user.id)
     .order("created_at", { ascending: false });
 
@@ -41,6 +41,7 @@ export async function GET() {
     projectDate: r.project_date,
     grandTotal: r.grand_total,
     created: r.created_at,
+    sentAt: r.sent_at,
   })));
 }
 
@@ -53,6 +54,20 @@ interface SaveBody {
   customerName?: string;
   customerEmail?: string;
   customerAddress?: string;
+  validityDays?: number;
+  deliveryDate?: string | null;
+  customerReference?: string;
+}
+
+async function generateQuoteReference(supabase: Awaited<ReturnType<typeof createClient>>, ownerId: string) {
+  const year = new Date().getFullYear();
+  const { count } = await supabase
+    .from("projects")
+    .select("id", { count: "exact", head: true })
+    .eq("owner", ownerId)
+    .gte("project_date", `${year}-01-01`)
+    .lte("project_date", `${year}-12-31`);
+  return `Q-${year}-${String((count ?? 0) + 1).padStart(4, "0")}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -64,7 +79,11 @@ export async function POST(req: NextRequest) {
   try { body = await req.json(); }
   catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
 
-  const { name, jobType, hourlyRate, marginPercent, rows, customerName, customerEmail, customerAddress } = body;
+  const {
+    name, jobType, hourlyRate, marginPercent, rows,
+    customerName, customerEmail, customerAddress,
+    validityDays, deliveryDate, customerReference,
+  } = body;
 
   if (!name?.trim()) return NextResponse.json({ error: "Project name is required" }, { status: 400 });
   if (!jobType || (jobType !== "renovation" && jobType !== "new-build"))
@@ -75,6 +94,7 @@ export async function POST(req: NextRequest) {
   try {
     const [catalog, kits] = await getDataCache();
     const quote = buildQuote(rows, kits, catalog, { hourlyRate, jobType, marginPercent });
+    const quoteReference = await generateQuoteReference(supabase, user.id);
 
     const { data: project, error: projError } = await supabase
       .from("projects")
@@ -89,6 +109,10 @@ export async function POST(req: NextRequest) {
         customer_name: customerName ?? "",
         customer_email: customerEmail ?? "",
         customer_address: customerAddress ?? "",
+        quote_reference: quoteReference,
+        validity_days: validityDays ?? 30,
+        delivery_date: deliveryDate ?? null,
+        customer_reference: customerReference ?? "",
       })
       .select("id, name")
       .single();

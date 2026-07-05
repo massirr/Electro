@@ -26,6 +26,9 @@ interface LoadTarget {
     customerName?: string;
     customerEmail?: string;
     customerAddress?: string;
+    validityDays?: number;
+    deliveryDate?: string | null;
+    customerReference?: string;
   };
   items: Array<{
     externalItemId: string;
@@ -201,6 +204,9 @@ export function TakeoffForm({
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
+  const [validityDays, setValidityDays] = useState(30);
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [customerReference, setCustomerReference] = useState("");
 
   // Save state
   const [saving, setSaving] = useState(false);
@@ -256,6 +262,9 @@ export function TakeoffForm({
     setCustomerName(project.customerName ?? "");
     setCustomerEmail(project.customerEmail ?? "");
     setCustomerAddress(project.customerAddress ?? "");
+    setValidityDays(project.validityDays ?? 30);
+    setDeliveryDate(project.deliveryDate ?? "");
+    setCustomerReference(project.customerReference ?? "");
     const newRows = items.map((item) => ({
       key: String(nextKeyRef.current++),
       id: item.externalItemId,
@@ -339,6 +348,9 @@ export function TakeoffForm({
           customerName: customerName.trim(),
           customerEmail: customerEmail.trim(),
           customerAddress: customerAddress.trim(),
+          validityDays,
+          deliveryDate: deliveryDate || null,
+          customerReference: customerReference.trim(),
         }),
       });
       if (!res.ok) {
@@ -401,6 +413,39 @@ export function TakeoffForm({
           onChange={(e) => { setCustomerAddress(e.target.value); setSaveOk(false); }}
           className="w-full text-sm px-3 py-2 mb-3 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
         />
+
+        {/* Quote metadata (shown on the PDF letterhead) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+          <label className="flex flex-col gap-1">
+            <span className="text-[10px] text-[var(--ink-subtle)]">Validity (days)</span>
+            <input
+              type="number"
+              min="1"
+              value={validityDays}
+              onChange={(e) => { setValidityDays(parseInt(e.target.value, 10) || 30); setSaveOk(false); }}
+              className="text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)]"
+            />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-[10px] text-[var(--ink-subtle)]">Delivery date</span>
+            <input
+              type="date"
+              value={deliveryDate}
+              onChange={(e) => { setDeliveryDate(e.target.value); setSaveOk(false); }}
+              className="text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)]"
+            />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-[10px] text-[var(--ink-subtle)]">Customer reference</span>
+            <input
+              type="text"
+              placeholder="Optional"
+              value={customerReference}
+              onChange={(e) => { setCustomerReference(e.target.value); setSaveOk(false); }}
+              className="text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
+            />
+          </label>
+        </div>
 
         {/* Job type toggle */}
         <div className="flex gap-1 mb-4">

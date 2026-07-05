@@ -10,6 +10,9 @@ export default function ProfilePage() {
   const [name, setName] = useState("");
   const [btwNumber, setBtwNumber] = useState("");
   const [hourlyRate, setHourlyRate] = useState("85");
+  const [companyAddress, setCompanyAddress] = useState("");
+  const [companyPhone, setCompanyPhone] = useState("");
+  const [companyWebsite, setCompanyWebsite] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +25,9 @@ export default function ProfilePage() {
       setName(user.name ?? "");
       setBtwNumber(user.btwNumber ?? "");
       setHourlyRate(String(user.hourlyRate ?? 85));
+      setCompanyAddress(user.companyAddress ?? "");
+      setCompanyPhone(user.companyPhone ?? "");
+      setCompanyWebsite(user.companyWebsite ?? "");
     }
   }, [user, loading, router]);
 
@@ -35,6 +41,9 @@ export default function ProfilePage() {
         name: name.trim(),
         btwNumber: btwNumber.trim(),
         hourlyRate: parseFloat(hourlyRate) || 85,
+        companyAddress: companyAddress.trim(),
+        companyPhone: companyPhone.trim(),
+        companyWebsite: companyWebsite.trim(),
       });
       setSaved(true);
     } catch (err) {
@@ -108,6 +117,42 @@ export default function ProfilePage() {
                 onChange={(e) => { setHourlyRate(e.target.value); setSaved(false); }}
                 placeholder="85"
                 className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)] [appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden"
+              />
+            </div>
+
+            <div className="pt-2 border-t border-[var(--hairline)]">
+              <p className="text-[10px] font-semibold tracking-widest uppercase text-[var(--ink-muted)] mb-3">
+                Quote letterhead
+              </p>
+            </div>
+            <div>
+              <label className="block text-xs text-[var(--ink-muted)] mb-1">Company address</label>
+              <input
+                type="text"
+                value={companyAddress}
+                onChange={(e) => { setCompanyAddress(e.target.value); setSaved(false); }}
+                placeholder="Straat 1, 1000 Brussel"
+                className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-[var(--ink-muted)] mb-1">Phone</label>
+              <input
+                type="text"
+                value={companyPhone}
+                onChange={(e) => { setCompanyPhone(e.target.value); setSaved(false); }}
+                placeholder="+32 123 45 67 89"
+                className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-[var(--ink-muted)] mb-1">Website</label>
+              <input
+                type="text"
+                value={companyWebsite}
+                onChange={(e) => { setCompanyWebsite(e.target.value); setSaved(false); }}
+                placeholder="www.bedrijf.be"
+                className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
               />
             </div>
 

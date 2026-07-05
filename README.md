@@ -69,6 +69,17 @@ Find these in your Supabase project under **Settings → API**.
 
 > The service role key is server-only and never exposed to the browser. Keep it out of version control.
 
+Optionally, to let the app email PDF quotes directly to customers (via [Resend](https://resend.com)):
+
+```env
+RESEND_API_KEY=your-resend-api-key
+RESEND_FROM_EMAIL=quotes@yourdomain.com
+```
+
+Requires verifying your sending domain at resend.com/domains first. Without these set, the
+"Email to customer" button shows a friendly error — downloading the branded PDF and sending it
+yourself always works regardless.
+
 ### 4. Run locally
 
 ```bash

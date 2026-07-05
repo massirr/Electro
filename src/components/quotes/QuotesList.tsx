@@ -7,6 +7,7 @@ interface SavedQuote {
   name: string;
   projectDate: string;
   grandTotal: number;
+  sentAt: string | null;
 }
 
 function fmt(n: number) {
@@ -30,6 +31,8 @@ export function QuotesList({
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
+  const [sendingId, setSendingId] = useState<string | null>(null);
+  const [sendError, setSendError] = useState<{ id: string; message: string } | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -53,6 +56,22 @@ export function QuotesList({
     await fetch(`/api/quotes/${id}/duplicate`, { method: "POST" });
     setDuplicatingId(null);
     onDuplicate(id);
+  }
+
+  async function handleSend(id: string) {
+    setSendingId(id);
+    setSendError(null);
+    try {
+      const res = await fetch(`/api/quotes/${id}/send`, { method: "POST" });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        setSendError({ id, message: (err as { error?: string }).error ?? "Failed to send" });
+        return;
+      }
+      setQuotes((prev) => prev.map((q) => (q.id === id ? { ...q, sentAt: new Date().toISOString() } : q)));
+    } finally {
+      setSendingId(null);
+    }
   }
 
   return (
@@ -81,7 +100,7 @@ export function QuotesList({
                 <span className="text-xs text-[var(--ink-muted)]">{q.projectDate}</span>
                 <span className="tabular-nums text-xs text-[var(--accent)]">{fmt(q.grandTotal)}</span>
               </div>
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 mb-1.5">
                 <button
                   onClick={() => onLoad(q.id)}
                   className="flex-1 text-xs px-2 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] active:opacity-70 transition-colors"
@@ -104,6 +123,24 @@ export function QuotesList({
                   ×
                 </button>
               </div>
+              <div className="flex gap-1.5">
+                <a
+                  href={`/api/quotes/${q.id}/pdf`}
+                  className="flex-1 text-center text-xs px-2 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] active:opacity-70 transition-colors"
+                >
+                  Download PDF
+                </a>
+                <button
+                  onClick={() => handleSend(q.id)}
+                  disabled={sendingId === q.id}
+                  className="flex-1 text-xs px-2 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] active:opacity-70 transition-colors disabled:opacity-40"
+                >
+                  {sendingId === q.id ? "Sending…" : q.sentAt ? "Sent ✓ — resend" : "Email to customer"}
+                </button>
+              </div>
+              {sendError?.id === q.id && (
+                <p className="text-xs text-[#e5533d] mt-1">{sendError.message}</p>
+              )}
             </li>
           ))}
         </ul>
