@@ -30,6 +30,9 @@ export function QuotesList({
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
   const [sendError, setSendError] = useState<{ id: string; message: string } | null>(null);
+  // Per-quote PDF language, chosen at download/send time (not persisted). Defaults to Dutch.
+  const [pdfLang, setPdfLang] = useState<Record<string, string>>({});
+  const langOf = (id: string) => pdfLang[id] ?? "nl";
 
   useEffect(() => {
     setLoading(true);
@@ -59,7 +62,7 @@ export function QuotesList({
     setSendingId(id);
     setSendError(null);
     try {
-      const res = await fetch(`/api/quotes/${id}/send`, { method: "POST" });
+      const res = await fetch(`/api/quotes/${id}/send?lang=${langOf(id)}`, { method: "POST" });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         setSendError({ id, message: (err as { error?: string }).error ?? "Failed to send" });
@@ -123,8 +126,19 @@ export function QuotesList({
                 </button>
               </div>
               <div className="flex gap-1.5">
+                <select
+                  value={langOf(q.id)}
+                  onChange={(e) => setPdfLang((p) => ({ ...p, [q.id]: e.target.value }))}
+                  title="Quote language"
+                  aria-label="Quote language"
+                  className="text-xs px-2 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] bg-[var(--surface-1)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] transition-colors"
+                >
+                  <option value="nl">NL</option>
+                  <option value="fr">FR</option>
+                  <option value="en">EN</option>
+                </select>
                 <a
-                  href={`/api/quotes/${q.id}/pdf`}
+                  href={`/api/quotes/${q.id}/pdf?lang=${langOf(q.id)}`}
                   className="flex-1 text-center text-xs px-2 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] active:opacity-70 transition-colors"
                 >
                   Download PDF

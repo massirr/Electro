@@ -2,7 +2,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { buildQuote } from "@/domain/calculators";
 import { loadCatalogAndKits } from "@/lib/catalog-seed";
-import { QuotePdfDocument, type QuotePdfDocumentProps } from "@/components/quote/QuotePdfDocument";
+import { QuotePdfDocument, type QuotePdfDocumentProps, type QuoteLanguage } from "@/components/quote/QuotePdfDocument";
+
+const DATE_LOCALE: Record<QuoteLanguage, string> = { en: "en-GB", fr: "fr-BE", nl: "nl-BE" };
 
 export interface ProjectQuoteData {
   projectName: string;
@@ -15,7 +17,8 @@ export interface ProjectQuoteData {
 export async function loadProjectQuote(
   supabase: SupabaseClient,
   projectId: string,
-  ownerId: string
+  ownerId: string,
+  language: QuoteLanguage = "nl"
 ): Promise<ProjectQuoteData | null> {
   // project/items/profile are independent reads — run concurrently instead of serially
   const [
@@ -64,13 +67,14 @@ export async function loadProjectQuote(
         address: project.customer_address ?? "",
       },
       meta: {
-        date: new Date(project.project_date ?? project.created_at).toLocaleDateString("fr-BE"),
+        date: new Date(project.project_date ?? project.created_at).toLocaleDateString(DATE_LOCALE[language]),
         reference: project.quote_reference ?? "",
         validityDays: project.validity_days ?? 30,
         deliveryDate: project.delivery_date ?? null,
         customerReference: project.customer_reference ?? "",
       },
       quote,
+      language,
     },
   };
 }

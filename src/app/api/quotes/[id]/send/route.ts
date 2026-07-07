@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
 import { loadProjectQuote, renderQuotePdfBuffer } from "@/lib/quotePdf";
+import type { QuoteLanguage } from "@/components/quote/QuotePdfDocument";
 
 // Strips characters that would break or inject into the RFC 5322 From header's
 // quoted-string display name (CR/LF header injection, unescaped quotes).
@@ -9,11 +10,16 @@ function sanitizeDisplayName(name: string) {
   return name.replace(/[\r\n"]/g, "");
 }
 
+function parseLang(v: string | null): QuoteLanguage {
+  return v === "fr" || v === "en" || v === "nl" ? v : "nl";
+}
+
 export async function POST(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const language = parseLang(req.nextUrl.searchParams.get("lang"));
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -27,7 +33,7 @@ export async function POST(
     );
   }
 
-  const data = await loadProjectQuote(supabase, id, user.id);
+  const data = await loadProjectQuote(supabase, id, user.id, language);
   if (!data) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   if (!data.customerEmail) {
