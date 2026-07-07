@@ -28,6 +28,28 @@
 
 ---
 
+## Session — 2026-07-05 (git divergence fix + navbar GitHub link)
+
+**Status:** Reconciled a stale local clone with origin/main. Navbar GitHub link + a start-of-session git-sync guardrail shipped. Professional PDF feature confirmed unmerged/undeployed — left on its branch pending review.
+
+### Done
+- **Root-caused "you keep forgetting" complaint:** the local clone was 1 ahead / 5 behind origin/main, with an uncommitted HANDOVER.md OLDER than origin's committed version. Every session was reading the stale local file. Rebased the local navbar commit onto origin/main; origin's superior HANDOVER is now the base.
+- **Navbar GitHub link** (`658a656`): was committed locally last session but never pushed — now on main.
+- **CLAUDE.md guardrail** (`bb8be8d`): added "Start of every session · step 0 — sync git before reading docs" (git fetch, diff HANDOVER vs origin, check for unmerged `origin/claude/*` branches). Also saved as auto-memory `technical-pitfalls-stale-clone`.
+
+### Decisions made
+- PDF feature (`origin/claude/read-handoff-q9ev2o`: react-pdf template, `/api/quotes/[id]/pdf` + `/send`, migration 004, 771 lines) is committed but NOT merged to main = NOT deployed. Decided: **review before merging** — run `/review` + verify PDF renders + apply migration 004 before landing. Do not merge blindly.
+
+### Blockers / open questions
+- Migration 004 (`004_quote_metadata.sql`) is NOT applied to Supabase yet — required before the PDF branch can work in production.
+- Stale local HANDOVER content backed up in session scratchpad + git stash `stale-local-handover-2026-07-05` (recoverable, can drop).
+
+### Start here next session
+1. `git fetch origin` FIRST, then read this file (per new CLAUDE.md step 0).
+2. To land the PDF feature: `git checkout claude/read-handoff-q9ev2o`, `/review`, verify PDF download renders, apply migration 004 via Supabase SQL Editor, then merge to main.
+
+---
+
 ## Session — 2026-07-05 (spec research: professional PDF quotes + multilingual app)
 
 **Status:** No app code changed this session — pure research + spec drafting. Two OpenSpec proposals written and pushed to `claude/read-handoff-q9ev2o`, neither implemented yet. HANDOVER.md catch-up from the prior session (see below) is also part of this branch.
