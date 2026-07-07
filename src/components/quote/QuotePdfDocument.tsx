@@ -31,6 +31,15 @@ const styles = StyleSheet.create({
   headerRight: { width: "40%" },
   title: { fontSize: 28, fontWeight: 700, letterSpacing: 1, marginBottom: 26 },
 
+  logoBox: {
+    alignSelf: "flex-end",
+    width: 130, height: 62,
+    borderWidth: 1, borderStyle: "solid", borderColor: "#cccccc", borderRadius: 4,
+    alignItems: "center", justifyContent: "center",
+    marginBottom: 40,
+  },
+  logoText: { color: "#bbbbbb", fontSize: 10, letterSpacing: 2 },
+
   senderLine: { color: "#333", marginBottom: 1 },
   senderGap: { height: 10 },
 
@@ -138,6 +147,9 @@ export function QuotePdfDocument({ company, customer, meta, quote }: QuotePdfDoc
           </View>
 
           <View style={styles.headerRight}>
+            <View style={styles.logoBox}>
+              <Text style={styles.logoText}>LOGO</Text>
+            </View>
             <Text style={styles.senderLine}>{company.name || "—"}</Text>
             {company.address ? <Text style={styles.senderLine}>{company.address}</Text> : null}
             <View style={styles.senderGap} />
