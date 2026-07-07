@@ -20,7 +20,7 @@ const LABELS: Record<QuoteLanguage, Record<string, string>> = {
     validity: "Geldigheid", days: "dagen", delivery: "Leverdatum", yourRef: "Uw referentie",
     vatNo: "BTW nummer",
     product: "Product", itemNo: "Artikelnummer", qty: "Aantal", rate: "Tarief", vat: "BTW", amount: "Bedrag",
-    labor: "Arbeid", materials: "Materialen", subtotal: "Subtotaal", margin: "Marge",
+    subtotalNet: "Subtotaal (excl. btw)",
     laborVat: "BTW arbeid", materialsVat: "BTW materialen", total: "Totaal",
     approvedClient: "Voor akkoord opdrachtgever", approvedContractor: "Voor akkoord opdrachtnemer",
     datePlace: "Datum, Plaats", signerName: "Naam tekeningsbevoegde", signature: "Handtekening tekeningsbevoegde",
@@ -30,7 +30,7 @@ const LABELS: Record<QuoteLanguage, Record<string, string>> = {
     validity: "Validité", days: "jours", delivery: "Date de livraison", yourRef: "Votre référence",
     vatNo: "N° TVA",
     product: "Produit", itemNo: "Référence", qty: "Quantité", rate: "Tarif", vat: "TVA", amount: "Montant",
-    labor: "Main d'œuvre", materials: "Matériaux", subtotal: "Sous-total", margin: "Marge",
+    subtotalNet: "Sous-total (hors TVA)",
     laborVat: "TVA main d'œuvre", materialsVat: "TVA matériaux", total: "Total",
     approvedClient: "Bon pour accord (client)", approvedContractor: "Bon pour accord (prestataire)",
     datePlace: "Date, Lieu", signerName: "Nom du signataire", signature: "Signature du signataire",
@@ -40,7 +40,7 @@ const LABELS: Record<QuoteLanguage, Record<string, string>> = {
     validity: "Validity", days: "days", delivery: "Delivery date", yourRef: "Your reference",
     vatNo: "VAT no.",
     product: "Product", itemNo: "Item no.", qty: "Qty", rate: "Rate", vat: "VAT", amount: "Amount",
-    labor: "Labor", materials: "Materials", subtotal: "Subtotal", margin: "Margin",
+    subtotalNet: "Subtotal (excl. VAT)",
     laborVat: "Labor VAT", materialsVat: "Materials VAT", total: "Total",
     approvedClient: "Approved by client", approvedContractor: "Approved by contractor",
     datePlace: "Date, Place", signerName: "Name of signatory", signature: "Signature of signatory",
@@ -147,11 +147,10 @@ export function QuotePdfDocument({ company, customer, meta, quote, language = "n
 
   const items = sortLineItems(quote.lineItems);
   const laborVatPct = quote.jobType === "renovation" ? "6%" : "21%";
+  // Customer-facing summary: margin is folded into the net subtotal, never shown as its own line.
+  // (subtotal + margin) is the pre-VAT selling price; + both VATs == grandTotal, so it reconciles.
   const summaryRows: [string, number][] = [
-    [t.labor, quote.laborTotal],
-    [t.materials, quote.materialTotal],
-    [t.subtotal, quote.subtotal],
-    [t.margin, quote.margin],
+    [t.subtotalNet, quote.subtotal + quote.margin],
     [`${t.laborVat} ${laborVatPct}`, quote.laborVat],
     [`${t.materialsVat} 6%`, quote.materialVat],
   ];
