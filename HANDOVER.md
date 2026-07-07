@@ -28,6 +28,31 @@
 
 ---
 
+## Session — 2026-07-07 (PDF preview + redesign to match reference offerte)
+
+**Status:** Previewed and redesigned the professional-quote PDF on its branch to match the client's reference offerte template. All work on `origin/claude/read-handoff-q9ev2o` (tip `e8c6598`) — `main` untouched/undeployed.
+
+### Done
+- Previewed the PDF WITHOUT the DB/migration by rendering `QuotePdfDocument` standalone with sample data (react-pdf `renderToFile`) in an isolated git worktree, then rasterized with `pdftoppm`. Reusable recipe for future PDF iteration.
+- **Fixed a currency bug**: `formatCurrency` uses `fr-BE`, which emits a narrow no-break space (U+202F) as the thousands separator; react-pdf's built-in Helvetica can't render it and showed `/` on every amount ≥ €1000 (e.g. `Totaal 3/068,08 €`). The PDF now uses a scoped `nl-BE` formatter (`€ 3.068,08`). Web app's `format.ts` left unchanged.
+- **Redesigned the template to match the reference**: green frame, `OFFERTE` title, sender contact top-right, `AAN` recipient top-left, Datum/Offertedatum/Geldigheid/Leverdatum/Uw referentie meta block, `Product/Artikelnummer/Aantal/Tarief/BTW/Bedrag` table with grey header + thick rules, reference-worded signature blocks.
+- Added a **LOGO placeholder** box top-right and lowered the sender block to match the reference position (per client screenshot feedback).
+
+### Decisions made
+- Logo: keep the placeholder for now; real logo (upload-to-profile vs one bundled file) deferred.
+- Summary: keep the correct Belgian split-VAT breakdown (labor/materials VAT), NOT the reference's single flat `BTW 21%` line — a flat 21% would be wrong for renovation labor (6%).
+
+### Blockers / open questions — RESOLVE BEFORE MERGING PDF BRANCH
+- **⚠️ Margin exposure**: the customer-facing PDF currently shows a `Margin` row (the contractor's markup). Most offertes fold margin into prices. Can't just delete the row (Subtotal + Margin + VAT = Total wouldn't add up) — needs a calc-presentation change in `buildQuoteSummaryRows` (shared with the web preview). Client decision pending.
+- **English summary labels** (`Labor`, `Materials`, `Subtotal`, `Margin`) on an otherwise-Dutch offerte — ties into the `multilingual-app` spec.
+- **Migration 004** (`004_quote_metadata.sql`) still NOT applied to Supabase — required before the branch works in production.
+
+### Start here next session
+1. `git fetch origin` first (per CLAUDE.md step 0), then `git checkout claude/read-handoff-q9ev2o`.
+2. Resolve margin visibility + Dutch labels, apply migration 004 via Supabase SQL Editor, run `/review`, then merge to main.
+
+---
+
 ## Session — 2026-07-05 (git divergence fix + navbar GitHub link)
 
 **Status:** Reconciled a stale local clone with origin/main. Navbar GitHub link + a start-of-session git-sync guardrail shipped. Professional PDF feature confirmed unmerged/undeployed — left on its branch pending review.
