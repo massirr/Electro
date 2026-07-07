@@ -59,17 +59,6 @@ export function QuotePreview({
         )}
       </div>
 
-      {/* Print button — hidden when printing */}
-      <div className="no-print flex justify-end">
-        <button
-          type="button"
-          onClick={() => window.print()}
-          className="text-xs font-medium px-3 py-1.5 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] transition-colors"
-        >
-          Print / PDF
-        </button>
-      </div>
-
       {/* Summary totals */}
       <section>
         <SectionLabel>Quote Summary</SectionLabel>
