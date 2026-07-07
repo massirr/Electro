@@ -16,6 +16,9 @@ interface LoadTarget {
     customerName?: string;
     customerEmail?: string;
     customerAddress?: string;
+    validityDays?: number;
+    deliveryDate?: string | null;
+    customerReference?: string;
   };
   items: Array<{
     externalItemId: string;

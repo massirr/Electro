@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatCurrency as fmt } from "@/lib/format";
+import type { QuoteLanguage } from "@/components/quote/QuotePdfDocument";
 
 interface SavedQuote {
   id: string;
   name: string;
   projectDate: string;
   grandTotal: number;
-}
-
-function fmt(n: number) {
-  return n.toLocaleString("fr-BE", { style: "currency", currency: "EUR" });
+  sentAt: string | null;
 }
 
 export function QuotesList({
@@ -30,6 +29,11 @@ export function QuotesList({
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
+  const [sendingId, setSendingId] = useState<string | null>(null);
+  const [sendError, setSendError] = useState<{ id: string; message: string } | null>(null);
+  // Per-quote PDF language, chosen at download/send time (not persisted). Defaults to Dutch.
+  const [pdfLang, setPdfLang] = useState<Record<string, QuoteLanguage>>({});
+  const langOf = (id: string): QuoteLanguage => pdfLang[id] ?? "nl";
 
   useEffect(() => {
     setLoading(true);
@@ -53,6 +57,24 @@ export function QuotesList({
     await fetch(`/api/quotes/${id}/duplicate`, { method: "POST" });
     setDuplicatingId(null);
     onDuplicate(id);
+  }
+
+  async function handleSend(id: string) {
+    setSendingId(id);
+    setSendError(null);
+    try {
+      const res = await fetch(`/api/quotes/${id}/send?lang=${langOf(id)}`, { method: "POST" });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        setSendError({ id, message: (err as { error?: string }).error ?? "Failed to send" });
+        return;
+      }
+      setQuotes((prev) => prev.map((q) => (q.id === id ? { ...q, sentAt: new Date().toISOString() } : q)));
+    } catch {
+      setSendError({ id, message: "Network error — check your connection and try again" });
+    } finally {
+      setSendingId(null);
+    }
   }
 
   return (
@@ -81,7 +103,7 @@ export function QuotesList({
                 <span className="text-xs text-[var(--ink-muted)]">{q.projectDate}</span>
                 <span className="tabular-nums text-xs text-[var(--accent)]">{fmt(q.grandTotal)}</span>
               </div>
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 mb-1.5">
                 <button
                   onClick={() => onLoad(q.id)}
                   className="flex-1 text-xs px-2 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] active:opacity-70 transition-colors"
@@ -104,6 +126,35 @@ export function QuotesList({
                   ×
                 </button>
               </div>
+              <div className="flex gap-1.5">
+                <select
+                  value={langOf(q.id)}
+                  onChange={(e) => setPdfLang((p) => ({ ...p, [q.id]: e.target.value as QuoteLanguage }))}
+                  title="Quote language"
+                  aria-label="Quote language"
+                  className="text-xs px-2 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] bg-[var(--surface-1)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] transition-colors"
+                >
+                  <option value="nl">NL</option>
+                  <option value="fr">FR</option>
+                  <option value="en">EN</option>
+                </select>
+                <a
+                  href={`/api/quotes/${q.id}/pdf?lang=${langOf(q.id)}`}
+                  className="flex-1 text-center text-xs px-2 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] active:opacity-70 transition-colors"
+                >
+                  Download PDF
+                </a>
+                <button
+                  onClick={() => handleSend(q.id)}
+                  disabled={sendingId === q.id}
+                  className="flex-1 text-xs px-2 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] active:opacity-70 transition-colors disabled:opacity-40"
+                >
+                  {sendingId === q.id ? "Sending…" : q.sentAt ? "Sent ✓ — resend" : "Email to customer"}
+                </button>
+              </div>
+              {sendError?.id === q.id && (
+                <p className="text-xs text-[#e5533d] mt-1">{sendError.message}</p>
+              )}
             </li>
           ))}
         </ul>

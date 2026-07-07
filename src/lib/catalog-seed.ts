@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { readFile } from "node:fs/promises";
 import { resolve } from "path";
+import type { Kit, Product } from "@/domain/types";
 
 const DATA = resolve(process.cwd(), "data/sample-inputs");
 
@@ -56,4 +57,33 @@ export async function ensureCatalogSeeded(supabase: SupabaseClient, userId: stri
     }
   }
   seededUsers.add(userId);
+}
+
+// Single source of truth for "this owner's current catalog + kits" — every
+// code path that computes a quote (live preview, save, PDF) must read the
+// same DB-backed catalog or their totals will silently disagree.
+export async function loadCatalogAndKits(
+  supabase: SupabaseClient,
+  ownerId: string
+): Promise<{ catalog: Map<string, Product>; kits: Kit[] }> {
+  await ensureCatalogSeeded(supabase, ownerId);
+
+  const [{ data: products }, { data: kitRows }] = await Promise.all([
+    supabase.from("catalog_products").select("sku, name, supplier, price, category").eq("owner", ownerId),
+    supabase.from("catalog_kits").select("slug, catalog_kit_components(sku, quantity_per_unit)").eq("owner", ownerId),
+  ]);
+
+  const catalog = new Map<string, Product>(
+    (products ?? []).map((p) => [p.sku, { sku: p.sku, name: p.name, supplier: p.supplier, price: p.price, category: p.category }])
+  );
+
+  const kits: Kit[] = (kitRows ?? []).map((k) => ({
+    takeoffId: k.slug,
+    components: ((k.catalog_kit_components as { sku: string; quantity_per_unit: number }[]) ?? []).map((c) => ({
+      sku: c.sku,
+      quantityPerUnit: c.quantity_per_unit,
+    })),
+  }));
+
+  return { catalog, kits };
 }
