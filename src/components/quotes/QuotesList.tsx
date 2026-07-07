@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatCurrency as fmt } from "@/lib/format";
+import type { QuoteLanguage } from "@/components/quote/QuotePdfDocument";
 
 interface SavedQuote {
   id: string;
@@ -31,8 +32,8 @@ export function QuotesList({
   const [sendingId, setSendingId] = useState<string | null>(null);
   const [sendError, setSendError] = useState<{ id: string; message: string } | null>(null);
   // Per-quote PDF language, chosen at download/send time (not persisted). Defaults to Dutch.
-  const [pdfLang, setPdfLang] = useState<Record<string, string>>({});
-  const langOf = (id: string) => pdfLang[id] ?? "nl";
+  const [pdfLang, setPdfLang] = useState<Record<string, QuoteLanguage>>({});
+  const langOf = (id: string): QuoteLanguage => pdfLang[id] ?? "nl";
 
   useEffect(() => {
     setLoading(true);
@@ -128,7 +129,7 @@ export function QuotesList({
               <div className="flex gap-1.5">
                 <select
                   value={langOf(q.id)}
-                  onChange={(e) => setPdfLang((p) => ({ ...p, [q.id]: e.target.value }))}
+                  onChange={(e) => setPdfLang((p) => ({ ...p, [q.id]: e.target.value as QuoteLanguage }))}
                   title="Quote language"
                   aria-label="Quote language"
                   className="text-xs px-2 py-2 sm:py-1 min-h-[40px] sm:min-h-0 rounded border border-[var(--hairline)] bg-[var(--surface-1)] text-[var(--ink-subtle)] hover:text-[var(--ink)] hover:border-[var(--hairline-strong)] transition-colors"

@@ -4,13 +4,18 @@ import { sortLineItems } from "@/domain/calculators";
 
 export type QuoteLanguage = "en" | "fr" | "nl";
 
-// Locale tag per language for currency/date formatting (Belgian conventions).
-// nl-BE/en-BE emit "€ 2.541,00"; fr-BE would emit a narrow no-break space (U+202F) as the
-// thousands separator, which the built-in Helvetica font can't render (shows as "/"), so the
-// French offerte formats money with fr-CA which uses a normal space + "$"→ no; use nl-BE digits
-// with a leading € for all — keep it simple and glyph-safe.
-const MONEY_LOCALE: Record<QuoteLanguage, string> = { en: "nl-BE", fr: "nl-BE", nl: "nl-BE" };
-const DATE_LOCALE: Record<QuoteLanguage, string> = { en: "en-GB", fr: "fr-BE", nl: "nl-BE" };
+export function parseQuoteLanguage(v: string | null): QuoteLanguage {
+  return v === "fr" || v === "en" || v === "nl" ? v : "nl";
+}
+
+// Date format follows the quote language (en-GB gives DD/MM/YYYY).
+export const DATE_LOCALE: Record<QuoteLanguage, string> = { en: "en-GB", fr: "fr-BE", nl: "nl-BE" };
+
+// One euro format for every language: "€ 3.068,08" (Belgian style — period thousands, comma
+// decimals). nl-NL grouping uses a regular period/comma which Helvetica renders fine — fr-BE's
+// U+202F narrow space did not (it showed as "/" on amounts ≥ 1000).
+const fmtEUR = (n: number) =>
+  "€ " + n.toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 // All user-facing PDF strings, keyed by language. This is the per-quote dictionary the
 // multilingual-app spec will fold into the shared message catalog later.
@@ -140,8 +145,6 @@ export interface QuotePdfDocumentProps {
 
 export function QuotePdfDocument({ company, customer, meta, quote, language = "nl" }: QuotePdfDocumentProps) {
   const t = LABELS[language];
-  const fmtEUR = (n: number) =>
-    n.toLocaleString(MONEY_LOCALE[language], { style: "currency", currency: "EUR" });
   const fmtDate = (iso: string | null | undefined) =>
     iso ? new Date(iso).toLocaleDateString(DATE_LOCALE[language]) : "—";
 

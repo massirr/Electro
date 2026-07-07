@@ -2,9 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { buildQuote } from "@/domain/calculators";
 import { loadCatalogAndKits } from "@/lib/catalog-seed";
-import { QuotePdfDocument, type QuotePdfDocumentProps, type QuoteLanguage } from "@/components/quote/QuotePdfDocument";
-
-const DATE_LOCALE: Record<QuoteLanguage, string> = { en: "en-GB", fr: "fr-BE", nl: "nl-BE" };
+import { QuotePdfDocument, DATE_LOCALE, type QuotePdfDocumentProps, type QuoteLanguage } from "@/components/quote/QuotePdfDocument";
 
 export interface ProjectQuoteData {
   projectName: string;
