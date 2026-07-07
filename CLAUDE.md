@@ -37,6 +37,15 @@ If the user is just planning or asking questions, Cowork is fine.
 For each OpenSpec change: propose → eng-review → apply → review → ship → archive
 
 ## Start of every session
+0. **Sync git BEFORE reading any docs** — work may have been done in another session/clone:
+   - `git fetch origin` then `git status` and `git log --oneline -10 origin/main`.
+   - If local `HANDOVER.md` is modified (M), the committed version on `origin/main` may be
+     NEWER than the working copy. Diff it (`git diff HEAD origin/main -- HANDOVER.md`) and
+     trust origin unless the local changes are clearly newer work — never read the stale file blindly.
+   - Check for unmerged feature branches: `git branch -a --contains` / `git branch -r`. A feature
+     can live on `origin/claude/*` and be committed but NOT on main (= NOT deployed). Cross-check
+     the last commits against the top HANDOVER entry; if a commit describes a feature the handover
+     doesn't, the local view is stale — trust git.
 1. Read HANDOVER.md — load last session's state and start-here instructions
 2. Read docs/MASTER_PLAN.md — find the last completed checkpoint
 3. Read AGENTS.md — confirm stack and quality gates
