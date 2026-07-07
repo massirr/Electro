@@ -1,111 +1,88 @@
 import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
 import type { QuoteResult } from "@/domain/types";
 import { sortLineItems, buildQuoteSummaryRows } from "@/domain/calculators";
-import { formatCurrency } from "@/lib/format";
+
+// PDF-scoped euro formatter. nl-BE emits "€ 2.541,00" (dot thousands, comma decimals) — matches
+// the reference offerte, and avoids fr-BE's narrow no-break space (U+202F) which the built-in
+// Helvetica font can't render (it showed up as "/" on any amount ≥ 1000).
+const fmtEUR = (n: number) => n.toLocaleString("nl-BE", { style: "currency", currency: "EUR" });
+
+// Materials always carry 6% BTW in the Belgian model; every catalog line item is a material.
+// ponytail: constant until line items ever carry a per-line rate.
+const LINE_BTW = "6%";
 
 function fmtDate(iso: string | null | undefined) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("fr-BE");
+  return new Date(iso).toLocaleDateString("nl-BE");
 }
 
+const GREEN = "#217346";
+
 const styles = StyleSheet.create({
-  page: {
-    padding: 40,
-    fontSize: 9,
-    fontFamily: "Helvetica",
-    color: "#1a1a1a",
-  },
+  page: { padding: 44, fontSize: 9, fontFamily: "Helvetica", color: "#1a1a1a", lineHeight: 1.4 },
   border: {
     position: "absolute",
-    top: 14,
-    left: 14,
-    right: 14,
-    bottom: 14,
-    borderWidth: 2,
-    borderStyle: "solid",
-    borderColor: "#5E6AD2",
+    top: 16, left: 16, right: 16, bottom: 16,
+    borderWidth: 4, borderStyle: "solid", borderColor: GREEN,
   },
-  title: { fontSize: 22, fontWeight: 700, marginBottom: 10 },
-  companyBlock: { maxWidth: 280, marginBottom: 20 },
-  companyName: { fontSize: 12, fontWeight: 700, marginBottom: 3 },
-  muted: { color: "#555" },
-  mutedLine: { color: "#555", marginBottom: 2 },
-  sectionLabel: {
-    fontSize: 7,
-    letterSpacing: 1,
-    textTransform: "uppercase",
-    color: "#888",
-    marginBottom: 5,
-  },
-  twoCol: { flexDirection: "row", justifyContent: "space-between", marginBottom: 22 },
-  col: { width: "48%" },
-  bold: { fontWeight: 700, marginBottom: 2 },
-  metaRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 3 },
-  section: { marginBottom: 18 },
-  tableHeader: {
+
+  header: { flexDirection: "row", justifyContent: "space-between", marginBottom: 28 },
+  headerLeft: { width: "55%" },
+  headerRight: { width: "40%" },
+  title: { fontSize: 28, fontWeight: 700, letterSpacing: 1, marginBottom: 26 },
+
+  senderLine: { color: "#333", marginBottom: 1 },
+  senderGap: { height: 10 },
+
+  label: { fontWeight: 700, marginBottom: 2 },
+  line: { color: "#333", marginBottom: 1 },
+
+  metaBlock: { marginTop: 22 },
+  metaRow: { flexDirection: "row", marginBottom: 2 },
+  metaLabel: { width: 110, color: "#333" },
+  metaLabelBold: { width: 110, fontWeight: 700 },
+  metaValue: { fontWeight: 700 },
+
+  table: { marginTop: 34 },
+  ruleThick: { borderBottomWidth: 1.5, borderBottomStyle: "solid", borderBottomColor: "#1a1a1a" },
+  headerRow: {
     flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomStyle: "solid",
-    borderBottomColor: "#ccc",
-    paddingBottom: 5,
-    marginBottom: 4,
+    backgroundColor: "#f2f2f2",
+    paddingVertical: 6,
+    paddingHorizontal: 2,
   },
-  tableRow: {
-    flexDirection: "row",
-    borderBottomWidth: 0.5,
-    borderBottomStyle: "solid",
-    borderBottomColor: "#eee",
-    paddingVertical: 4,
-  },
-  th: { fontSize: 7, fontWeight: 700, color: "#666", textTransform: "uppercase" },
-  colSku: { width: "14%" },
-  colName: { width: "32%" },
-  colSupplier: { width: "20%" },
+  row: { flexDirection: "row", paddingVertical: 5, paddingHorizontal: 2 },
+  th: { fontWeight: 700, fontSize: 8.5 },
+
+  colProduct: { width: "26%" },
+  colArt: { width: "18%" },
   colQty: { width: "12%", textAlign: "right" },
-  colTotal: { width: "22%", textAlign: "right" },
-  summary: { marginTop: 16, alignSelf: "flex-end", width: "55%" },
-  summaryRow: {
+  colTarief: { width: "16%", textAlign: "right" },
+  colBtw: { width: "12%", textAlign: "right" },
+  colBedrag: { width: "16%", textAlign: "right" },
+
+  summary: { marginTop: 2 },
+  summaryRow: { flexDirection: "row", paddingVertical: 3, paddingHorizontal: 2 },
+  sumLabelCell: { width: "72%", textAlign: "right", paddingRight: 12, color: "#333" },
+  sumValueCell: { width: "16%", textAlign: "right" },
+  totaalRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 4,
-    borderBottomWidth: 0.5,
-    borderBottomStyle: "solid",
-    borderBottomColor: "#eee",
+    paddingVertical: 6, paddingHorizontal: 2, marginTop: 2,
+    borderTopWidth: 1.5, borderTopStyle: "solid", borderTopColor: "#1a1a1a",
   },
-  grandTotalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "baseline",
-    paddingTop: 10,
-    marginTop: 4,
-  },
-  grandTotalLabel: { fontSize: 10, fontWeight: 700 },
-  grandTotalValue: { fontSize: 16, fontWeight: 700 },
-  signatures: { flexDirection: "row", justifyContent: "space-between", marginTop: 50 },
+  totaalLabel: { width: "72%", textAlign: "right", paddingRight: 12, fontWeight: 700, fontSize: 11 },
+  totaalValue: { width: "16%", textAlign: "right", fontWeight: 700, fontSize: 11 },
+
+  signatures: { flexDirection: "row", justifyContent: "space-between", marginTop: 64 },
   signatureBlock: { width: "45%" },
-  signatureLine: {
-    borderBottomWidth: 0.5,
-    borderBottomStyle: "solid",
-    borderBottomColor: "#999",
-    marginTop: 26,
-    marginBottom: 5,
-  },
-  signatureLabel: { fontSize: 7, color: "#888" },
+  sigTitle: { fontWeight: 700, marginBottom: 2 },
+  sigSub: { color: "#333", marginBottom: 30 },
+  sigField: { color: "#333", marginBottom: 14 },
 });
 
 export interface QuotePdfDocumentProps {
-  company: {
-    name: string;
-    address: string;
-    phone: string;
-    website: string;
-    btwNumber: string;
-  };
-  customer: {
-    name: string;
-    email: string;
-    address: string;
-  };
+  company: { name: string; address: string; phone: string; website: string; btwNumber: string };
+  customer: { name: string; email: string; address: string };
   meta: {
     date: string;
     reference: string;
@@ -125,97 +102,106 @@ export function QuotePdfDocument({ company, customer, meta, quote }: QuotePdfDoc
       <Page size="A4" style={styles.page}>
         <View style={styles.border} fixed />
 
-        <Text style={styles.title}>OFFERTE</Text>
+        {/* Header: title + recipient on the left, sender contact on the right */}
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <Text style={styles.title}>OFFERTE</Text>
 
-        <View style={styles.companyBlock}>
-          <Text style={styles.companyName}>{company.name || "—"}</Text>
-          {company.address ? <Text style={styles.mutedLine}>{company.address}</Text> : null}
-          {company.phone ? <Text style={styles.mutedLine}>{company.phone}</Text> : null}
-          {company.website ? <Text style={styles.mutedLine}>{company.website}</Text> : null}
-          {company.btwNumber ? <Text style={styles.mutedLine}>BTW: {company.btwNumber}</Text> : null}
-        </View>
+            <Text style={styles.label}>AAN</Text>
+            <Text style={styles.line}>{customer.name || "—"}</Text>
+            {customer.address ? <Text style={styles.line}>{customer.address}</Text> : null}
+            {customer.email ? <Text style={styles.line}>{customer.email}</Text> : null}
 
-        <View style={styles.twoCol}>
-          <View style={styles.col}>
-            <Text style={styles.sectionLabel}>Aan</Text>
-            <Text style={styles.bold}>{customer.name || "—"}</Text>
-            {customer.address ? <Text style={styles.mutedLine}>{customer.address}</Text> : null}
-            {customer.email ? <Text style={styles.mutedLine}>{customer.email}</Text> : null}
-          </View>
-          <View style={styles.col}>
-            <Text style={styles.sectionLabel}>Offerte</Text>
-            <View style={styles.metaRow}>
-              <Text style={styles.muted}>Datum</Text>
-              <Text>{meta.date}</Text>
-            </View>
-            <View style={styles.metaRow}>
-              <Text style={styles.muted}>Referentie</Text>
-              <Text>{meta.reference || "—"}</Text>
-            </View>
-            <View style={styles.metaRow}>
-              <Text style={styles.muted}>Geldigheid</Text>
-              <Text>{meta.validityDays} dagen</Text>
-            </View>
-            <View style={styles.metaRow}>
-              <Text style={styles.muted}>Leverdatum</Text>
-              <Text>{fmtDate(meta.deliveryDate)}</Text>
-            </View>
-            {meta.customerReference ? (
+            <View style={styles.metaBlock}>
               <View style={styles.metaRow}>
-                <Text style={styles.muted}>Uw referentie</Text>
-                <Text>{meta.customerReference}</Text>
+                <Text style={styles.metaLabel}>Datum :</Text>
+                <Text>{meta.date}</Text>
               </View>
-            ) : null}
+              <View style={styles.metaRow}>
+                <Text style={styles.metaLabelBold}>Offertedatum:</Text>
+                <Text style={styles.metaValue}>{meta.reference || "—"}</Text>
+              </View>
+              <View style={styles.senderGap} />
+              <View style={styles.metaRow}>
+                <Text style={styles.metaLabel}>Geldigheid</Text>
+                <Text>{meta.validityDays} dagen</Text>
+              </View>
+              <View style={styles.metaRow}>
+                <Text style={styles.metaLabel}>Leverdatum</Text>
+                <Text>{fmtDate(meta.deliveryDate)}</Text>
+              </View>
+              <View style={styles.metaRow}>
+                <Text style={styles.metaLabel}>Uw referentie</Text>
+                <Text>{meta.customerReference || "—"}</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.headerRight}>
+            <Text style={styles.senderLine}>{company.name || "—"}</Text>
+            {company.address ? <Text style={styles.senderLine}>{company.address}</Text> : null}
+            <View style={styles.senderGap} />
+            {company.phone ? <Text style={styles.senderLine}>T: {company.phone}</Text> : null}
+            {company.website ? <Text style={styles.senderLine}>W: {company.website}</Text> : null}
+            <View style={styles.senderGap} />
+            {company.btwNumber ? <Text style={styles.senderLine}>BTW nummer: {company.btwNumber}</Text> : null}
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Line Items</Text>
-          <View style={styles.tableHeader}>
-            <Text style={[styles.th, styles.colSku]}>SKU</Text>
-            <Text style={[styles.th, styles.colName]}>Product</Text>
-            <Text style={[styles.th, styles.colSupplier]}>Supplier</Text>
-            <Text style={[styles.th, styles.colQty]}>Qty</Text>
-            <Text style={[styles.th, styles.colTotal]}>Bedrag</Text>
+        {/* Line items table */}
+        <View style={styles.table}>
+          <View style={styles.ruleThick} />
+          <View style={styles.headerRow}>
+            <Text style={[styles.th, styles.colProduct]}>Product</Text>
+            <Text style={[styles.th, styles.colArt]}>Artikelnummer</Text>
+            <Text style={[styles.th, styles.colQty]}>Aantal</Text>
+            <Text style={[styles.th, styles.colTarief]}>Tarief</Text>
+            <Text style={[styles.th, styles.colBtw]}>BTW</Text>
+            <Text style={[styles.th, styles.colBedrag]}>Bedrag</Text>
           </View>
+          <View style={styles.ruleThick} />
+
           {items.map((li) => (
-            <View style={styles.tableRow} key={li.sku} wrap={false}>
-              <Text style={styles.colSku}>{li.sku}</Text>
-              <Text style={styles.colName}>{li.name}</Text>
-              <Text style={styles.colSupplier}>{li.supplier}</Text>
-              <Text style={styles.colQty}>{li.quantity}</Text>
-              <Text style={styles.colTotal}>{formatCurrency(li.totalPrice)}</Text>
+            <View style={styles.row} key={li.sku} wrap={false}>
+              <Text style={styles.colProduct}>{li.name}</Text>
+              <Text style={styles.colArt}>{li.sku}</Text>
+              <Text style={styles.colQty}>{li.quantity.toFixed(2)}</Text>
+              <Text style={styles.colTarief}>{fmtEUR(li.unitPrice)}</Text>
+              <Text style={styles.colBtw}>{LINE_BTW}</Text>
+              <Text style={styles.colBedrag}>{fmtEUR(li.totalPrice)}</Text>
             </View>
           ))}
-        </View>
 
-        <View style={styles.summary} wrap={false}>
-          {summaryRows.map(([label, value]) => (
-            <View style={styles.summaryRow} key={label}>
-              <Text style={styles.muted}>{label}</Text>
-              <Text>{formatCurrency(value)}</Text>
+          <View style={styles.ruleThick} />
+
+          {/* Summary — keeps the correct Belgian split-VAT breakdown, styled like the reference */}
+          <View style={styles.summary}>
+            {summaryRows.map(([label, value]) => (
+              <View style={styles.summaryRow} key={label}>
+                <Text style={styles.sumLabelCell}>{label}</Text>
+                <Text style={styles.sumValueCell}>{fmtEUR(value)}</Text>
+              </View>
+            ))}
+            <View style={styles.totaalRow}>
+              <Text style={styles.totaalLabel}>Totaal</Text>
+              <Text style={styles.totaalValue}>{fmtEUR(quote.grandTotal)}</Text>
             </View>
-          ))}
-          <View style={styles.grandTotalRow}>
-            <Text style={styles.grandTotalLabel}>Totaal</Text>
-            <Text style={styles.grandTotalValue}>{formatCurrency(quote.grandTotal)}</Text>
           </View>
         </View>
 
+        {/* Signature blocks */}
         <View style={styles.signatures} wrap={false}>
           <View style={styles.signatureBlock}>
-            <Text style={styles.sectionLabel}>Voor akkoord opdrachtgever</Text>
-            <View style={styles.signatureLine} />
-            <Text style={styles.signatureLabel}>Datum, plaats</Text>
-            <View style={styles.signatureLine} />
-            <Text style={styles.signatureLabel}>Naam en handtekening</Text>
+            <Text style={styles.sigTitle}>Voor akkoord opdrachtgever</Text>
+            <Text style={styles.sigSub}>Datum, Plaats</Text>
+            <Text style={styles.sigField}>Naam tekeningsbevoegde</Text>
+            <Text style={styles.sigField}>Handtekening tekeningsbevoegde</Text>
           </View>
           <View style={styles.signatureBlock}>
-            <Text style={styles.sectionLabel}>Voor akkoord opdrachtnemer</Text>
-            <View style={styles.signatureLine} />
-            <Text style={styles.signatureLabel}>Datum, plaats</Text>
-            <View style={styles.signatureLine} />
-            <Text style={styles.signatureLabel}>Naam en handtekening</Text>
+            <Text style={styles.sigTitle}>Voor akkoord opdrachtnemer</Text>
+            <Text style={styles.sigSub}>Datum, Plaats</Text>
+            <Text style={styles.sigField}>Naam tekeningsbevoegde</Text>
+            <Text style={styles.sigField}>Handtekening tekeningsbevoegde</Text>
           </View>
         </View>
       </Page>
