@@ -28,28 +28,33 @@
 
 ---
 
-## Session — 2026-07-07 (PDF preview + redesign to match reference offerte)
+## Session — 2026-07-07 (PDF: redesign to reference + trilingual + language picker + margin fix)
 
-**Status:** Previewed and redesigned the professional-quote PDF on its branch to match the client's reference offerte template. All work on `origin/claude/read-handoff-q9ev2o` (tip `e8c6598`) — `main` untouched/undeployed.
+**Status:** Reworked the professional-quote PDF on its branch — matches the client's reference offerte, is trilingual (NL/FR/EN) with a per-quote language picker, and no longer exposes margin. All work on `origin/claude/read-handoff-q9ev2o` (tip `531963f`) — `main` untouched/undeployed.
 
 ### Done
-- Previewed the PDF WITHOUT the DB/migration by rendering `QuotePdfDocument` standalone with sample data (react-pdf `renderToFile`) in an isolated git worktree, then rasterized with `pdftoppm`. Reusable recipe for future PDF iteration.
-- **Fixed a currency bug**: `formatCurrency` uses `fr-BE`, which emits a narrow no-break space (U+202F) as the thousands separator; react-pdf's built-in Helvetica can't render it and showed `/` on every amount ≥ €1000 (e.g. `Totaal 3/068,08 €`). The PDF now uses a scoped `nl-BE` formatter (`€ 3.068,08`). Web app's `format.ts` left unchanged.
-- **Redesigned the template to match the reference**: green frame, `OFFERTE` title, sender contact top-right, `AAN` recipient top-left, Datum/Offertedatum/Geldigheid/Leverdatum/Uw referentie meta block, `Product/Artikelnummer/Aantal/Tarief/BTW/Bedrag` table with grey header + thick rules, reference-worded signature blocks.
-- Added a **LOGO placeholder** box top-right and lowered the sender block to match the reference position (per client screenshot feedback).
+- **Preview recipe** (reusable): render `QuotePdfDocument` standalone with sample data via react-pdf `renderToFile` in an isolated git worktree, then rasterize with `pdftoppm` — previews the PDF with NO DB/auth/migration needed.
+- **Currency bug fixed**: `fr-BE` emits a narrow no-break space (U+202F) thousands separator that react-pdf's Helvetica renders as `/` on amounts ≥ €1000. PDF now formats money per-language (glyph-safe `nl-BE` digits). Web `format.ts` untouched.
+- **Redesigned to match the reference**: green frame, `OFFERTE` title, sender top-right, `AAN` recipient top-left, meta block, `Product/Artikelnummer/Aantal/Tarief/BTW/Bedrag` table, signature blocks. Added a **LOGO placeholder** top-right + lowered the sender block (per client screenshot).
+- **Trilingual template (NL/FR/EN)**: all strings resolve from a per-language `LABELS` dictionary via a `language` prop; money/date formatting switches locale. `QUOTE`/`DEVIS`/`OFFERTE` all verified rendering.
+- **Per-quote language picker**: NL/FR/EN `<select>` per quote in `QuotesList`; Download PDF + Email pass `?lang=` → `pdf`/`send` routes → `loadProjectQuote(language)`. Chosen at download/send time, NOT persisted → no migration needed.
+- **Margin hidden from customer**: summary folds margin into one `Subtotal (excl. VAT)` row (`subtotal + margin` = pre-VAT selling price); `+ both VAT rows = grandTotal`, reconciles exactly. Internal Labor/Materials cost split dropped from the PDF summary; itemized product table unchanged. Web `QuotePreview` (electrician-facing) still shows the full breakdown.
 
 ### Decisions made
-- Logo: keep the placeholder for now; real logo (upload-to-profile vs one bundled file) deferred.
-- Summary: keep the correct Belgian split-VAT breakdown (labor/materials VAT), NOT the reference's single flat `BTW 21%` line — a flat 21% would be wrong for renovation labor (6%).
+- Logo: keep placeholder for now; real logo (profile upload vs bundled file) deferred.
+- Language: per-quote, chosen at download time (no `projects.language` column) — keeps it migration-free. Whole-app UI translation is explicitly OUT of scope (phase 2, not doing now).
+- Split VAT kept (labor 6%/21% + materials 6%), not the reference's flat 21% line.
 
 ### Blockers / open questions — RESOLVE BEFORE MERGING PDF BRANCH
-- **⚠️ Margin exposure**: the customer-facing PDF currently shows a `Margin` row (the contractor's markup). Most offertes fold margin into prices. Can't just delete the row (Subtotal + Margin + VAT = Total wouldn't add up) — needs a calc-presentation change in `buildQuoteSummaryRows` (shared with the web preview). Client decision pending.
-- **English summary labels** (`Labor`, `Materials`, `Subtotal`, `Margin`) on an otherwise-Dutch offerte — ties into the `multilingual-app` spec.
-- **Migration 004** (`004_quote_metadata.sql`) still NOT applied to Supabase — required before the branch works in production.
+- **⚠️ Migration 004** (`004_quote_metadata.sql`) still NOT applied to production Supabase — `loadProjectQuote` SELECTs columns it adds, so every PDF download errors until it's applied via SQL Editor.
+- **⚠️ Pre-existing type errors on the branch** (unrelated to this session's edits) that may block a prod build: `scripts/seed-pocketbase.ts` (dead PocketBase import), `src/app/auth/callback/route.ts` (`Request.cookies`), `src/components/takeoff/TakeoffForm.tsx` + `tests/api/catalog.test.ts` (`CatalogItem` not exported). Run `bunx tsc --noEmit` and fix before merge.
+- Line-item table still shows catalog **cost** prices (Tarief/Bedrag) — margin is only hidden in the summary. If cost exposure matters, revisit.
+- Couldn't run the full authed download-in-browser flow here (needs magic-link login + a saved quote); template verified via standalone render in all 3 languages.
 
 ### Start here next session
 1. `git fetch origin` first (per CLAUDE.md step 0), then `git checkout claude/read-handoff-q9ev2o`.
-2. Resolve margin visibility + Dutch labels, apply migration 004 via Supabase SQL Editor, run `/review`, then merge to main.
+2. Apply migration 004 via Supabase SQL Editor; fix the pre-existing tsc errors; `bun run build` to confirm; run `/review`.
+3. QA the download flow: save a quote, download in NL/FR/EN, confirm no margin row + totals reconcile, then merge to main.
 
 ---
 
