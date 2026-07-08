@@ -93,7 +93,7 @@ export default function ProfilePage() {
                 type="text"
                 value={name}
                 onChange={(e) => { setName(e.target.value); setSaved(false); }}
-                placeholder="Your company name"
+                placeholder="Name"
                 className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
               />
             </div>
