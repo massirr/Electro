@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/NavBar";
+import { Footer } from "@/components/Footer";
 import { Analytics } from "@/components/Analytics";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -29,9 +30,10 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body>
+      <body className="min-h-screen flex flex-col">
         <NavBar />
-        {children}
+        <div className="flex-1">{children}</div>
+        <Footer />
         <Analytics />
       </body>
     </html>
