@@ -5,11 +5,15 @@ Defines how a calculated quote is presented in the on-screen quote preview (`Quo
 
 ## Requirements
 ### Requirement: totals-display
-The quote preview SHALL show labor total, material total, subtotal, margin amount, VAT amount, and grand total as distinct labelled rows.
+The quote preview SHALL show labor total, material total, subtotal, margin amount, labor VAT, materials VAT, and grand total as distinct labelled rows.
 
 #### Scenario: all totals visible
 - **WHEN** a QuoteResult is passed to QuotePreview
-- **THEN** labor, materials, subtotal, margin, VAT, and grand total each appear as a labelled row with a formatted currency value
+- **THEN** labor, materials, subtotal, margin, labor VAT, materials VAT, and grand total each appear as a labelled row with a formatted currency value
+
+#### Scenario: labor VAT row shows the applicable rate
+- **WHEN** the summary renders for a quote whose jobType is `renovation` (labor VAT 6%) or `new-build` (labor VAT 21%)
+- **THEN** the labor VAT row label reflects that rate, and the materials VAT row is always labelled 6%
 
 #### Scenario: grand total is visually distinct
 - **WHEN** the summary renders
