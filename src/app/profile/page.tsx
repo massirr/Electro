@@ -93,7 +93,7 @@ export default function ProfilePage() {
                 type="text"
                 value={name}
                 onChange={(e) => { setName(e.target.value); setSaved(false); }}
-                placeholder="Jan Janssen"
+                placeholder="Your company name"
                 className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
               />
             </div>
@@ -103,7 +103,7 @@ export default function ProfilePage() {
                 type="text"
                 value={btwNumber}
                 onChange={(e) => { setBtwNumber(e.target.value); setSaved(false); }}
-                placeholder="BE 0123.456.789"
+                placeholder="BE 0000.000.000"
                 className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
               />
             </div>
@@ -131,7 +131,7 @@ export default function ProfilePage() {
                 type="text"
                 value={companyAddress}
                 onChange={(e) => { setCompanyAddress(e.target.value); setSaved(false); }}
-                placeholder="Straat 1, 1000 Brussel"
+                placeholder="Street, postcode, city"
                 className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
               />
             </div>
@@ -141,7 +141,7 @@ export default function ProfilePage() {
                 type="text"
                 value={companyPhone}
                 onChange={(e) => { setCompanyPhone(e.target.value); setSaved(false); }}
-                placeholder="+32 123 45 67 89"
+                placeholder="+32 …"
                 className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
               />
             </div>
@@ -151,7 +151,7 @@ export default function ProfilePage() {
                 type="text"
                 value={companyWebsite}
                 onChange={(e) => { setCompanyWebsite(e.target.value); setSaved(false); }}
-                placeholder="www.bedrijf.be"
+                placeholder="www.example.com"
                 className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
               />
             </div>
