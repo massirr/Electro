@@ -8,6 +8,7 @@ export default function ProfilePage() {
   const { user, loading, updateProfile, logout } = useAuth();
   const router = useRouter();
   const [name, setName] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [btwNumber, setBtwNumber] = useState("");
   const [hourlyRate, setHourlyRate] = useState("85");
   const [companyAddress, setCompanyAddress] = useState("");
@@ -23,6 +24,7 @@ export default function ProfilePage() {
     if (!loading && !user) { router.push("/login"); return; }
     if (user) {
       setName(user.name ?? "");
+      setCompanyName(user.companyName ?? "");
       setBtwNumber(user.btwNumber ?? "");
       setHourlyRate(String(user.hourlyRate ?? 85));
       setCompanyAddress(user.companyAddress ?? "");
@@ -39,6 +41,7 @@ export default function ProfilePage() {
     try {
       await updateProfile({
         name: name.trim(),
+        companyName: companyName.trim(),
         btwNumber: btwNumber.trim(),
         hourlyRate: parseFloat(hourlyRate) || 85,
         companyAddress: companyAddress.trim(),
@@ -124,6 +127,16 @@ export default function ProfilePage() {
               <p className="text-[10px] font-semibold tracking-widest uppercase text-[var(--ink-muted)] mb-3">
                 Quote letterhead
               </p>
+            </div>
+            <div>
+              <label className="block text-xs text-[var(--ink-muted)] mb-1">Company name</label>
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => { setCompanyName(e.target.value); setSaved(false); }}
+                placeholder="Shown on the offerte letterhead"
+                className="w-full text-sm px-3 py-2 bg-[var(--surface-1)] border border-[var(--hairline)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 text-[var(--ink)] placeholder:text-[var(--ink-subtle)]"
+              />
             </div>
             <div>
               <label className="block text-xs text-[var(--ink-muted)] mb-1">Company address</label>

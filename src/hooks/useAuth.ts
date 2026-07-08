@@ -8,6 +8,7 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string;
+  companyName: string;
   btwNumber: string;
   hourlyRate: number;
   companyAddress: string;
@@ -26,13 +27,14 @@ export function useAuth() {
       if (!supabaseUser) { setUser(null); setLoading(false); return; }
       const { data: profile } = await supabase
         .from("profiles")
-        .select("name, btw_number, hourly_rate, company_address, company_phone, company_website")
+        .select("name, company_name, btw_number, hourly_rate, company_address, company_phone, company_website")
         .eq("id", supabaseUser.id)
         .single();
       setUser({
         id: supabaseUser.id,
         email: supabaseUser.email ?? "",
         name: profile?.name ?? "",
+        companyName: profile?.company_name ?? "",
         btwNumber: profile?.btw_number ?? "",
         hourlyRate: profile?.hourly_rate ?? 85,
         companyAddress: profile?.company_address ?? "",
@@ -70,6 +72,7 @@ export function useAuth() {
 
   const updateProfile = useCallback(async (data: {
     name?: string;
+    companyName?: string;
     btwNumber?: string;
     hourlyRate?: number;
     companyAddress?: string;
@@ -81,6 +84,7 @@ export function useAuth() {
     if (!u) throw new Error("Not authenticated");
     const { error } = await supabase.from("profiles").update({
       name: data.name,
+      company_name: data.companyName,
       btw_number: data.btwNumber,
       hourly_rate: data.hourlyRate,
       company_address: data.companyAddress,
@@ -92,6 +96,7 @@ export function useAuth() {
     setUser(prev => prev ? {
       ...prev,
       ...data,
+      companyName: data.companyName ?? prev.companyName,
       btwNumber: data.btwNumber ?? prev.btwNumber,
       companyAddress: data.companyAddress ?? prev.companyAddress,
       companyPhone: data.companyPhone ?? prev.companyPhone,

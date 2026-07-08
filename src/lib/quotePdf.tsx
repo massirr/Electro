@@ -26,7 +26,7 @@ export async function loadProjectQuote(
   ] = await Promise.all([
     supabase.from("projects").select("*").eq("id", projectId).eq("owner", ownerId).single(),
     supabase.from("takeoff_items").select("*").eq("project_id", projectId),
-    supabase.from("profiles").select("name, btw_number, company_address, company_phone, company_website").eq("id", ownerId).single(),
+    supabase.from("profiles").select("name, company_name, btw_number, company_address, company_phone, company_website").eq("id", ownerId).single(),
   ]);
 
   if (projError || !project || itemsError) return null;
@@ -53,7 +53,8 @@ export async function loadProjectQuote(
     quoteReference: project.quote_reference ?? "",
     pdfProps: {
       company: {
-        name: profile?.name ?? "",
+        // Prefer the dedicated company name; fall back to the profile display name.
+        name: profile?.company_name || profile?.name || "",
         address: profile?.company_address ?? "",
         phone: profile?.company_phone ?? "",
         website: profile?.company_website ?? "",
