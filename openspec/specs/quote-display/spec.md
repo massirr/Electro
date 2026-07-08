@@ -1,10 +1,11 @@
 # quote-display Specification
 
 ## Purpose
-TBD - created by archiving change quote-preview. Update Purpose after archive.
+Defines how a calculated quote is presented in the on-screen quote preview (`QuotePreview`): the totals breakdown, the per-supplier material breakdown, and the detailed line-item table.
+
 ## Requirements
 ### Requirement: totals-display
-Show labor total, material total, subtotal, margin amount, VAT amount, and grand total as distinct labelled rows.
+The quote preview SHALL show labor total, material total, subtotal, margin amount, VAT amount, and grand total as distinct labelled rows.
 
 #### Scenario: all totals visible
 - **WHEN** a QuoteResult is passed to QuotePreview
@@ -17,7 +18,7 @@ Show labor total, material total, subtotal, margin amount, VAT amount, and grand
 ---
 
 ### Requirement: supplier-breakdown
-Show total material cost per supplier as a secondary section.
+The quote preview SHALL show total material cost per supplier as a secondary section.
 
 #### Scenario: two suppliers
 - **WHEN** lineItems contain CEBO and Rexel products
@@ -26,7 +27,7 @@ Show total material cost per supplier as a secondary section.
 ---
 
 ### Requirement: line-items-detail
-Show all expanded line items (sku, name, supplier, qty, unit price, total).
+The quote preview SHALL show all expanded line items (sku, name, supplier, qty, unit price, total).
 
 #### Scenario: line items visible
 - **WHEN** QuotePreview renders
