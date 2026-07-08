@@ -50,17 +50,29 @@
 - ✅ **`/review` run** on the diff — fixed: money format → `€ 3.068,08` (glyph-safe `nl-NL` grouping), removed a garbled comment, deduped `parseQuoteLanguage`/`DATE_LOCALE`, tightened the `pdfLang` type.
 - Pre-existing tsc errors (`seed-pocketbase.ts`, `auth/callback`, `TakeoffForm`/catalog test) are **non-blocking** — `next.config.ts` has `typescript.ignoreBuildErrors: true` and they already exist on main. Cleanup deferred.
 
+### Also shipped this session (post-merge, all on main)
+- **Removed the "Print / PDF" button** from `QuotePreview` (`window.print()` of the internal view was mistaken for the customer PDF) — single PDF path is now Save → Download PDF.
+- **Placeholder cleanup**: replaced fake-data input placeholders (`jan@electro.be`, `Jan Janssen`, `www.bedrijf.be`, etc.) with generic non-semantic hints; profile Name placeholder is `Name`.
+- **Inactivity logout rewritten** (`useInactivityLogout.ts`): was a `setTimeout` countdown that pauses during device sleep / frozen tabs (so an 8h-open tab never logged out). Now tracks a last-activity timestamp and checks `Date.now()` elapsed on a 30s interval + on `visibilitychange`/`focus` — logs out after 1h of *real* inactivity, incl. on wake from sleep. Still client-side only (RLS + API `getUser()` are the real server-side security).
+- **OpenSpec `quote-display` spec**: retrofitted to pass `openspec validate --specs --strict` (added `SHALL` to all 3 requirements, real Purpose) and updated for split VAT (labor VAT + materials VAT rows).
+
+### OpenSpec housekeeping (this session)
+- Archived the completed-but-drifted changes (implemented + deployed long ago, never archived): catalog-management, hide-cost-pdf, hours-to-catalog, quote-duplication, supplier-order-export, vat-split, quote-persistence.
+- **HELD** `professional-quote-pdf` archive until post-deploy QA is done (see below).
+- `multilingual-app` left open — only PDF phase-1 implemented; whole-app UI translation not built.
+
 ### Open / not done
+- **⚠️ Post-deploy QA still owed** (blocks archiving `professional-quote-pdf`): on the live site, save a quote and download it in NL/FR/EN — confirm it renders, no margin row, totals reconcile.
 - **Real logo** — still a placeholder box; needs a logo asset or a profile upload feature.
 - **Resend email** not configured (`RESEND_API_KEY`/`RESEND_FROM_EMAIL` + verify `irakozedarlo.be`) — the "Email to customer" button 501s until then; PDF download works without it.
 - Line-item table shows catalog **cost** prices — margin only hidden in the summary.
-- **Post-deploy QA still owed**: on the live site, save a quote and download it in NL/FR/EN — confirm no margin row + totals reconcile.
 - Whole-app UI translation (phase 2) intentionally not done.
+- Pre-existing tsc errors (non-blocking via `ignoreBuildErrors`) still uncleaned.
 
 ### Start here next session
 1. `git fetch origin` first (per CLAUDE.md step 0).
-2. Post-deploy QA of the PDF download in all 3 languages on production.
-3. Optionally: real logo, Resend setup, or start multilingual phase 2.
+2. **Post-deploy QA** of the PDF download in all 3 languages on production, then `openspec archive professional-quote-pdf`.
+3. Optionally: real logo, Resend setup, multilingual phase 2, or clean the pre-existing tsc errors.
 
 ---
 
