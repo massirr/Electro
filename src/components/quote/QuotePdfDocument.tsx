@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, View, Text, StyleSheet, Svg, Path } from "@react-pdf/renderer";
 import type { QuoteResult } from "@/domain/types";
 import { sortLineItems } from "@/domain/calculators";
 
@@ -73,12 +73,12 @@ const styles = StyleSheet.create({
 
   logoBox: {
     alignSelf: "flex-end",
-    width: 130, height: 62,
-    borderWidth: 1, borderStyle: "solid", borderColor: "#cccccc", borderRadius: 4,
+    width: 62, height: 62,
+    backgroundColor: GREEN,
+    borderRadius: 10,
     alignItems: "center", justifyContent: "center",
     marginBottom: 40,
   },
-  logoText: { color: "#bbbbbb", fontSize: 10, letterSpacing: 2 },
 
   senderLine: { color: "#333", marginBottom: 1 },
   senderGap: { height: 10 },
@@ -200,7 +200,9 @@ export function QuotePdfDocument({ company, customer, meta, quote, language = "n
 
           <View style={styles.headerRight}>
             <View style={styles.logoBox}>
-              <Text style={styles.logoText}>LOGO</Text>
+              <Svg width={30} height={30} viewBox="0 0 24 24">
+                <Path d="M13 2 L3 14 L12 14 L11 22 L21 10 L12 10 Z" fill="#ffffff" />
+              </Svg>
             </View>
             <Text style={styles.senderLine}>{company.name || "—"}</Text>
             {company.address ? <Text style={styles.senderLine}>{company.address}</Text> : null}
