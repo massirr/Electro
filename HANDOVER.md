@@ -28,6 +28,33 @@
 
 ---
 
+## Session — 2026-07-09 (letterhead polish: company name, logo, footer, theme fix)
+
+**Status:** All shipped and deployed to `main`. Live site validated (public pages). Migrations 004 + 005 applied to production Supabase.
+
+### Done
+- **Company name field** (migration `005_company_name.sql`): new `profiles.company_name`, a "Company name" input in Profile → Quote letterhead, and the PDF company block prefers `company_name` and falls back to the display `name`. Migration 005 applied to prod (confirmed via `information_schema`).
+- **Original logo mark**: replaced the empty `LOGO` placeholder box with a license-free white lightning bolt on a green badge, drawn via react-pdf `Svg`/`Path` (no third-party/copyrighted image — the user sent the Excel logo as a placeholder; declined web-sourcing a copyrighted logo). Swap for a real asset later.
+- **Site footer** (`Footer.tsx`): themed footer (copyright · GitHub · prod URL) pinned to the bottom via `min-h-screen flex-col` in the root layout. Playwright-verified.
+- **Theme white-flash fix**: added `color-scheme: dark`/`light` to the theme classes in `globals.css`. The `/auth/callback` magic-link URL is a route handler (redirect, no HTML/CSS), so the browser painted its default white canvas during the hop. `color-scheme: dark` makes the browser hold a dark canvas across navigation gaps + themes native controls. **Live-verified**: fresh visitor (empty localStorage) → `dark` + `color-scheme: dark`.
+- **Placeholder cleanup**: fake-data input placeholders (`jan@electro.be`, `Jan Janssen`, `www.bedrijf.be`, …) → generic hints; profile Name placeholder is `Name`.
+
+### Decisions made
+- Logo: bundle one original mark for all users (not per-user upload) — fine for a solo tool; drawn in-code as vector, no asset file.
+- Company name is separate from the profile display Name (which still drives the navbar); PDF falls back to Name so old quotes don't break.
+- Held both company-name + logo commits locally until migration 005 was applied to prod, then pushed together (avoids the "column does not exist" trap).
+
+### Live validation (this session, via Playwright on prod)
+- ✅ Deploy live, footer present, `you@example.com` placeholder, GitHub icon, fresh-visitor dark theme + `color-scheme: dark`. Only console error is the pre-existing `favicon.ico` 404.
+- 🔲 **Not validated (behind auth)**: Company name field, logo in a downloaded PDF, 1-hour inactivity logout timing — need a logged-in session.
+
+### Start here next session
+1. `git fetch origin` first (per CLAUDE.md step 0).
+2. **Authed QA still owed**: log in, fill Profile letterhead + Company name, save a quote, Download PDF in NL/FR/EN — confirm company name + logo show, no margin row, totals reconcile. Then `openspec archive professional-quote-pdf`.
+3. Optional: real logo asset, Resend email setup, multilingual phase 2, favicon (kills the 404).
+
+---
+
 ## Session — 2026-07-07 (professional-quote-pdf MERGED to main + deployed)
 
 **Status:** The professional-quote PDF is merged to `main` and deployed. Matches the client's reference offerte, trilingual (NL/FR/EN) with a per-quote language picker, margin hidden from the customer, Belgian `€ 3.068,08` money format. Migration 004 applied to production Supabase.
