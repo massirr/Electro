@@ -9,14 +9,6 @@ export function Footer() {
         <span>© {year} Electro — Electrical quoting tool</span>
         <div className="flex items-center gap-4">
           <a
-            href="https://github.com/massirr/Electro"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-[var(--ink)] transition-colors"
-          >
-            GitHub
-          </a>
-          <a
             href="https://electro-quote.vercel.app"
             className="hover:text-[var(--ink)] transition-colors"
           >
